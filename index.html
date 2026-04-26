@@ -4,221 +4,77 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>TinyLog — Baby Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root {
-  --bg: #fef6f0;
-  --bg2: #fff9f5;
-  --card: #ffffff;
-  --border: rgba(0,0,0,0.07);
-  --border2: rgba(0,0,0,0.12);
-  --text: #1a1208;
-  --text2: #6b5c4e;
-  --text3: #a89484;
-  --accent: #e8703a;
-  --accent2: #f5a678;
-  --accent-bg: #fff2eb;
-  --pink: #e85a8a;
-  --pink-bg: #ffeef5;
-  --blue: #3a82e8;
-  --blue-bg: #eef4ff;
-  --green: #2db87a;
-  --green-bg: #edfaf3;
-  --purple: #7c5ce8;
-  --purple-bg: #f0ecff;
-  --amber: #e8a62d;
-  --amber-bg: #fff8eb;
-  --red: #e84040;
-  --red-bg: #fff0f0;
-  --shadow: 0 2px 12px rgba(0,0,0,0.06);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
-  --r: 16px;
-  --r-sm: 10px;
-  --nav-h: 64px;
+:root{
+  --bg:#fef6f0;--bg2:#fff9f5;--card:#fff;--border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.12);
+  --text:#1a1208;--text2:#6b5c4e;--text3:#a89484;
+  --accent:#e8703a;--accent2:#f5a678;--accent-bg:#fff2eb;
+  --pink:#e85a8a;--pink-bg:#ffeef5;
+  --blue:#3a82e8;--blue-bg:#eef4ff;
+  --green:#2db87a;--green-bg:#edfaf3;
+  --purple:#7c5ce8;--purple-bg:#f0ecff;
+  --amber:#e8a62d;--amber-bg:#fff8eb;
+  --red:#e84040;--red-bg:#fff0f0;
+  --shadow:0 2px 12px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.10);
+  --r:16px;--r-sm:10px;--nav-h:64px;
 }
-[data-theme="dark"] {
-  --bg: #0a0a0a;
-  --bg2: #111111;
-  --card: #181818;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.14);
-  --text: #f5f0ea;
-  --text2: #a89484;
-  --text3: #6b5c4e;
-  --accent: #f5855a;
-  --accent2: #e8703a;
-  --accent-bg: #1f1208;
-  --pink: #f0709a;
-  --pink-bg: #1f0a12;
-  --blue: #5a9ef5;
-  --blue-bg: #0a1020;
-  --green: #3dd68a;
-  --green-bg: #071a10;
-  --purple: #9a7cf5;
-  --purple-bg: #120a20;
-  --amber: #f5c03a;
-  --amber-bg: #1a1202;
-  --red: #f56060;
-  --red-bg: #1a0505;
-  --shadow: 0 2px 12px rgba(0,0,0,0.4);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
+[data-theme="dark"]{
+  --bg:#0a0a0a;--bg2:#111;--card:#181818;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.14);
+  --text:#f5f0ea;--text2:#a89484;--text3:#6b5c4e;
+  --accent:#f5855a;--accent2:#e8703a;--accent-bg:#1f1208;
+  --pink:#f0709a;--pink-bg:#1f0a12;
+  --blue:#5a9ef5;--blue-bg:#0a1020;
+  --green:#3dd68a;--green-bg:#071a10;
+  --purple:#9a7cf5;--purple-bg:#120a20;
+  --amber:#f5c03a;--amber-bg:#1a1202;
+  --red:#f56060;--red-bg:#1a0505;
+  --shadow:0 2px 12px rgba(0,0,0,.4);--shadow-lg:0 8px 32px rgba(0,0,0,.6);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html{scroll-behavior:smooth;}
-body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100vh;
-  font-size:15px;
-  line-height:1.5;
-  overscroll-behavior:none;
-}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5;overscroll-behavior:none;}
 /* HEADER */
-.app-header{
-  background:var(--card);
-  border-bottom:1px solid var(--border);
-  padding:env(safe-area-inset-top,0) 0 0;
-  position:sticky;top:0;z-index:50;
-}
-.header-top{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px 8px;
-}
-.app-title{
-  font-family:'DM Serif Display',serif;
-  font-size:20px;color:var(--accent);
-  letter-spacing:-0.3px;
-}
+.app-header{background:var(--card);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0) 0 0;position:sticky;top:0;z-index:50;}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;}
+.app-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent);letter-spacing:-.3px;}
 .header-actions{display:flex;align-items:center;gap:8px;}
-.icon-btn{
-  width:36px;height:36px;border-radius:50%;
-  border:1px solid var(--border2);background:var(--bg2);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:16px;transition:all .15s;
-}
+.icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .15s;}
 .icon-btn:active{transform:scale(.93);}
-/* BABY BAR */
-.baby-bar{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 16px 10px;
-}
-.baby-ava{
-  width:34px;height:34px;border-radius:50%;
-  background:var(--accent-bg);border:2px solid var(--accent2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;flex-shrink:0;
-}
+.baby-bar{display:flex;align-items:center;gap:10px;padding:8px 16px 10px;}
+.baby-ava{width:34px;height:34px;border-radius:50%;background:var(--accent-bg);border:2px solid var(--accent2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
 .baby-info{flex:1;}
-.baby-name-display{font-size:14px;font-weight:600;color:var(--text);}
-.baby-age-display{font-size:11px;color:var(--text3);}
-/* CAREGIVER BADGE */
-.caregiver-badge{
-  display:flex;align-items:center;gap:5px;
-  background:var(--accent-bg);border:1px solid var(--accent2);
-  border-radius:20px;padding:4px 10px;cursor:pointer;
-  font-size:11px;font-weight:600;color:var(--accent);
-}
+.baby-name-d{font-size:14px;font-weight:600;}
+.baby-age-d{font-size:11px;color:var(--text3);}
+.caregiver-badge{display:flex;align-items:center;gap:5px;background:var(--accent-bg);border:1px solid var(--accent2);border-radius:20px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:600;color:var(--accent);}
 /* NAV */
-.bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;
-  background:var(--card);
-  border-top:1px solid var(--border);
-  display:flex;
-  padding-bottom:env(safe-area-inset-bottom,0);
-  z-index:50;height:var(--nav-h);
-}
-.nav-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:3px;border:none;background:none;
-  font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;
-  color:var(--text3);cursor:pointer;padding:8px 4px;
-  transition:color .15s;
-}
-.nav-item .ni{font-size:20px;line-height:1;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0);z-index:50;height:var(--nav-h);}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;color:var(--text3);cursor:pointer;padding:8px 2px;transition:color .15s;}
+.nav-item .ni{font-size:19px;line-height:1;}
 .nav-item.active{color:var(--accent);}
 /* MAIN */
-.main{
-  padding:12px 14px calc(var(--nav-h) + 12px);
-  max-width:480px;margin:0 auto;
-}
+.main{padding:12px 14px calc(var(--nav-h) + 12px);max-width:480px;margin:0 auto;}
 .page{display:none;}
 .page.active{display:block;}
 /* CARDS */
-.card{
-  background:var(--card);border-radius:var(--r);
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
-  padding:14px;margin-bottom:12px;
-}
-.card-title{
-  font-size:13px;font-weight:600;color:var(--text3);
-  text-transform:uppercase;letter-spacing:.05em;
-  margin-bottom:12px;
-}
-/* PREDICTION STRIP */
-.pred-strip{
-  display:grid;grid-template-columns:1fr 1fr;gap:8px;
-  margin-bottom:12px;
-}
-.pred-box{
-  background:var(--card);border-radius:var(--r);
-  border:1px solid var(--border);
-  padding:12px;text-align:center;
-}
-.pred-label{font-size:10px;color:var(--text3);font-weight:500;margin-bottom:4px;}
-.pred-val{font-size:22px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
-.pred-sub{font-size:10px;color:var(--text2);margin-top:2px;}
-.pred-urgent{border-color:var(--accent);background:var(--accent-bg);}
-.pred-urgent .pred-val{color:var(--accent);}
-/* TODAY SUMMARY */
-.today-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;}
-.today-stat{
-  background:var(--card);border-radius:var(--r-sm);
-  border:1px solid var(--border);
-  padding:10px 6px;text-align:center;
-}
-.ts-val{font-size:20px;font-weight:600;color:var(--text);}
-.ts-lbl{font-size:10px;color:var(--text3);margin-top:2px;}
+.card{background:var(--card);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow);padding:14px;margin-bottom:12px;}
+.card-title{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;}
 /* FORM */
 .field{margin-bottom:10px;}
-label.lbl{
-  display:block;font-size:11px;font-weight:600;
-  color:var(--text3);margin-bottom:4px;letter-spacing:.03em;
-}
-input[type=text],input[type=number],input[type=date],
-input[type=time],input[type=datetime-local],select,textarea{
-  width:100%;background:var(--bg2);
-  border:1px solid var(--border2);border-radius:var(--r-sm);
-  padding:9px 11px;font-family:'DM Sans',sans-serif;
-  font-size:14px;color:var(--text);outline:none;
-  transition:border-color .2s;
-  -webkit-appearance:none;
-}
-input:focus,select:focus{border-color:var(--accent);}
+label.lbl{display:block;font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px;letter-spacing:.03em;}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=datetime-local],select,textarea{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-sm);padding:9px 11px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 /* TOGGLES */
 .tg-group{display:flex;gap:5px;flex-wrap:wrap;}
-.tg{
-  border:1px solid var(--border2);border-radius:20px;
-  padding:5px 12px;font-family:'DM Sans',sans-serif;
-  font-size:12px;font-weight:500;background:var(--bg2);
-  color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;
-}
+.tg{border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;background:var(--bg2);color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;}
 .tg.on{background:var(--accent);border-color:var(--accent);color:#fff;}
 .tg.pink.on{background:var(--pink);border-color:var(--pink);}
 .tg.blue.on{background:var(--blue);border-color:var(--blue);}
 .tg.green.on{background:var(--green);border-color:var(--green);}
 .tg.purple.on{background:var(--purple);border-color:var(--purple);}
 /* BUTTONS */
-.btn{
-  border:none;border-radius:20px;
-  padding:10px 20px;font-family:'DM Sans',sans-serif;
-  font-size:14px;font-weight:600;cursor:pointer;
-  transition:transform .12s,opacity .12s;display:inline-flex;
-  align-items:center;gap:6px;
-}
+.btn{border:none;border-radius:20px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:transform .12s,opacity .12s;display:inline-flex;align-items:center;gap:6px;}
 .btn:active{transform:scale(.96);}
 .btn-accent{background:var(--accent);color:#fff;}
 .btn-pink{background:var(--pink);color:#fff;}
@@ -230,178 +86,170 @@ input:focus,select:focus{border-color:var(--accent);}
 .btn-full{width:100%;justify-content:center;}
 /* LOG LIST */
 .log-list{display:flex;flex-direction:column;gap:1px;}
-.log-item{
-  display:flex;align-items:center;gap:10px;
-  padding:9px 0;border-bottom:1px solid var(--border);
-}
+.log-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
 .log-item:last-child{border-bottom:none;}
-.log-icon{
-  width:32px;height:32px;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:15px;flex-shrink:0;
-}
+.log-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
 .log-body{flex:1;min-width:0;}
-.log-main{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.log-main{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .log-sub{font-size:11px;color:var(--text3);margin-top:1px;}
 .log-right{display:flex;align-items:center;gap:6px;}
 .log-time{font-size:11px;color:var(--text3);white-space:nowrap;}
-.del-btn{
-  width:22px;height:22px;border-radius:50%;border:none;
-  background:none;color:var(--text3);cursor:pointer;
-  font-size:12px;display:flex;align-items:center;justify-content:center;
-  transition:color .15s;flex-shrink:0;
-}
+.del-btn{width:22px;height:22px;border-radius:50%;border:none;background:none;color:var(--text3);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:color .15s;flex-shrink:0;}
 .del-btn:hover{color:var(--red);}
 /* SLEEP TIMER */
-.sleep-timer-card{
-  background:var(--purple-bg);border:1px solid var(--purple);
-  border-radius:var(--r);padding:16px;text-align:center;
-  margin-bottom:12px;
-}
-.sleep-big{
-  font-family:'DM Serif Display',serif;
-  font-size:48px;color:var(--purple);
-  font-variant-numeric:tabular-nums;
-  letter-spacing:-1px;
-}
-.sleep-label{font-size:12px;color:var(--purple);opacity:.7;margin-top:4px;}
-/* GROWTH CHART */
-#growthCanvas{width:100%;border-radius:8px;display:block;}
-/* VACCINE TABLE */
-.vacc-list{display:flex;flex-direction:column;gap:6px;}
-.vacc-item{
-  display:flex;align-items:center;gap:10px;
-  background:var(--bg2);border-radius:var(--r-sm);
-  border:1px solid var(--border);padding:10px 12px;
-}
+.sleep-timer-card{background:var(--purple-bg);border:1px solid var(--purple);border-radius:var(--r);padding:16px;text-align:center;margin-bottom:12px;}
+.sleep-big{font-family:'DM Serif Display',serif;font-size:48px;color:var(--purple);font-variant-numeric:tabular-nums;letter-spacing:-1px;}
+/* CHARTS */
+canvas{width:100%;border-radius:8px;display:block;}
+/* MILESTONES */
+.ms-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.ms-card{border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;cursor:pointer;transition:all .2s;background:var(--card);}
+.ms-card.done{background:var(--green-bg);border-color:var(--green);}
+.ms-icon{font-size:24px;margin-bottom:4px;}
+.ms-name{font-size:12px;font-weight:500;}
+.ms-hint{font-size:10px;color:var(--text3);margin-top:2px;}
+.ms-badge{font-size:10px;font-weight:600;color:var(--green);margin-top:3px;}
+/* VACCINE */
+.vacc-item{display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:var(--r-sm);border:1px solid var(--border);padding:10px 12px;margin-bottom:6px;}
 .vacc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.vacc-body{flex:1;}
-.vacc-name{font-size:13px;font-weight:500;color:var(--text);}
+.vacc-name{font-size:13px;font-weight:500;}
 .vacc-age{font-size:11px;color:var(--text3);}
-.vacc-status{
-  font-size:11px;font-weight:600;padding:3px 9px;
-  border-radius:20px;white-space:nowrap;
-}
+.vacc-status{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap;}
 .vs-done{background:var(--green-bg);color:var(--green);}
 .vs-due{background:var(--amber-bg);color:var(--amber);}
 .vs-upcoming{background:var(--bg2);color:var(--text3);border:1px solid var(--border2);}
-.vacc-check{cursor:pointer;font-size:18px;}
-/* MEDICINE */
-.med-active{
-  background:var(--amber-bg);border:1px solid var(--amber);
-  border-radius:var(--r);padding:12px;margin-bottom:8px;
-}
-/* MILESTONE GRID */
-.ms-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
-.ms-card{
-  border:1px solid var(--border);border-radius:var(--r);
-  padding:12px;text-align:center;cursor:pointer;
-  transition:all .2s;background:var(--card);
-}
-.ms-card.done{
-  background:var(--green-bg);border-color:var(--green);
-}
-.ms-icon{font-size:24px;margin-bottom:4px;}
-.ms-name{font-size:12px;font-weight:500;color:var(--text);}
-.ms-hint{font-size:10px;color:var(--text3);margin-top:2px;}
-.ms-badge{font-size:10px;font-weight:600;color:var(--green);margin-top:3px;}
 /* MODAL */
-.modal-wrap{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.5);backdrop-filter:blur(4px);
-  z-index:200;align-items:flex-end;justify-content:center;
-  padding:0;
-}
+.modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:200;align-items:flex-end;justify-content:center;}
 .modal-wrap.open{display:flex;}
-.modal{
-  background:var(--card);
-  border-radius:24px 24px 0 0;
-  padding:20px 18px calc(20px + env(safe-area-inset-bottom,0));
-  width:100%;max-width:480px;
-  max-height:85vh;overflow-y:auto;
-}
-.modal-handle{
-  width:36px;height:4px;background:var(--border2);
-  border-radius:2px;margin:0 auto 16px;
-}
+.modal{background:var(--card);border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0));width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px;}
 .modal-title{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:16px;}
 /* PILLS */
-.pill{
-  display:inline-flex;align-items:center;gap:4px;
-  padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;
-}
-.pill-accent{background:var(--accent-bg);color:var(--accent);}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
 .pill-pink{background:var(--pink-bg);color:var(--pink);}
 .pill-blue{background:var(--blue-bg);color:var(--blue);}
 .pill-green{background:var(--green-bg);color:var(--green);}
 .pill-purple{background:var(--purple-bg);color:var(--purple);}
-/* SECTION HEAD */
-.sec-head{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:10px;
-}
-.sec-head h3{font-size:15px;font-weight:600;color:var(--text);}
-/* EMPTY */
-.empty{
-  text-align:center;padding:24px 12px;
-  color:var(--text3);font-size:13px;
-}
-.empty-icon{font-size:32px;margin-bottom:6px;}
-/* TOAST */
-.toast{
-  position:fixed;bottom:calc(var(--nav-h) + 10px);left:50%;
-  transform:translateX(-50%) translateY(20px);
-  background:var(--text);color:var(--bg);
-  padding:10px 20px;border-radius:20px;
-  font-size:13px;font-weight:500;
-  z-index:300;opacity:0;transition:all .25s;
-  white-space:nowrap;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-/* DARK MODE TOGGLE */
-.theme-btn{font-size:18px;}
-/* SCHEDULE STRIP */
-.sched-strip{
-  display:flex;gap:6px;overflow-x:auto;
-  padding-bottom:4px;scrollbar-width:none;
-}
+.pill-accent{background:var(--accent-bg);color:var(--accent);}
+/* PREDICTIONS */
+.pred-strip{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.pred-box{background:var(--card);border-radius:var(--r);border:1px solid var(--border);padding:12px;text-align:center;}
+.pred-label{font-size:10px;color:var(--text3);font-weight:500;margin-bottom:4px;}
+.pred-val{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;}
+.pred-sub{font-size:10px;color:var(--text2);margin-top:2px;}
+.pred-urgent{border-color:var(--accent);background:var(--accent-bg);}
+.pred-urgent .pred-val{color:var(--accent);}
+/* SCHEDULE */
+.sched-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
 .sched-strip::-webkit-scrollbar{display:none;}
-.sched-pill{
-  flex-shrink:0;background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--r-sm);padding:8px 12px;text-align:center;
-  min-width:70px;
-}
-.sched-time{font-size:12px;font-weight:600;color:var(--text);}
+.sched-pill{flex-shrink:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;text-align:center;min-width:70px;}
+.sched-time{font-size:12px;font-weight:600;}
 .sched-act{font-size:10px;color:var(--text3);}
 .sched-pill.next{border-color:var(--accent);background:var(--accent-bg);}
 .sched-pill.next .sched-time{color:var(--accent);}
+/* TODAY STATS */
+.today-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;}
+.today-stat{background:var(--card);border-radius:var(--r-sm);border:1px solid var(--border);padding:10px 6px;text-align:center;}
+.ts-val{font-size:20px;font-weight:600;}
+.ts-lbl{font-size:10px;color:var(--text3);margin-top:2px;}
+/* EMPTY */
+.empty{text-align:center;padding:24px 12px;color:var(--text3);font-size:13px;}
+.empty-icon{font-size:32px;margin-bottom:6px;}
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--nav-h) + 10px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:300;opacity:0;transition:all .25s;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+/* ====== AI INSIGHTS PAGE ====== */
+.ai-hero{
+  background:linear-gradient(135deg,var(--purple-bg),var(--accent-bg));
+  border:1px solid var(--purple);border-radius:var(--r);
+  padding:20px;margin-bottom:12px;text-align:center;
+}
+.ai-hero-icon{font-size:36px;margin-bottom:8px;}
+.ai-hero h2{font-family:'DM Serif Display',serif;font-size:20px;color:var(--purple);margin-bottom:4px;}
+.ai-hero p{font-size:13px;color:var(--text2);}
+/* Period selector */
+.period-tabs{display:flex;background:var(--bg2);border-radius:12px;padding:3px;gap:3px;margin-bottom:12px;}
+.period-tab{flex:1;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--text3);padding:7px 4px;border-radius:9px;cursor:pointer;transition:all .2s;}
+.period-tab.active{background:var(--card);color:var(--purple);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+/* Custom range */
+.custom-range{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;margin-bottom:12px;display:none;}
+.custom-range.show{display:block;}
+/* AI Summary card */
+.ai-summary-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px;margin-bottom:12px;
+}
+.ai-generating{
+  display:flex;flex-direction:column;align-items:center;
+  gap:12px;padding:24px;
+}
+.ai-spinner{
+  width:40px;height:40px;border-radius:50%;
+  border:3px solid var(--purple-bg);
+  border-top-color:var(--purple);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ai-gen-label{font-size:13px;color:var(--text2);font-style:italic;}
+/* Summary sections */
+.summary-section{margin-bottom:16px;}
+.summary-section:last-child{margin-bottom:0;}
+.ss-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ss-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.ss-title{font-size:13px;font-weight:700;color:var(--text);}
+.ss-body{font-size:13px;color:var(--text2);line-height:1.6;}
+/* Flags */
+.flag-list{display:flex;flex-direction:column;gap:6px;}
+.flag-item{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:10px;font-size:12px;}
+.flag-ok{background:var(--green-bg);color:var(--text2);}
+.flag-warn{background:var(--amber-bg);color:var(--text2);}
+.flag-alert{background:var(--red-bg);color:var(--text2);}
+.flag-dot{font-size:14px;flex-shrink:0;}
+/* Stats grid */
+.stats-mini{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px;}
+.stat-mini{background:var(--bg2);border-radius:10px;padding:10px;text-align:center;}
+.stat-mini-val{font-size:18px;font-weight:700;color:var(--text);}
+.stat-mini-lbl{font-size:10px;color:var(--text3);margin-top:2px;}
+/* PDF button */
+.pdf-btn-row{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);margin-top:4px;}
+/* API KEY card */
+.apikey-card{background:var(--purple-bg);border:1px solid var(--purple);border-radius:var(--r);padding:14px;margin-bottom:12px;}
+.apikey-label{font-size:11px;font-weight:700;color:var(--purple);margin-bottom:6px;}
+.apikey-input-row{display:flex;gap:8px;}
+.apikey-input-row input{flex:1;font-family:'DM Mono',monospace;font-size:12px;}
+.apikey-note{font-size:11px;color:var(--text3);margin-top:6px;}
+/* Med reminder */
+.med-active{background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--r);padding:12px;margin-bottom:8px;}
+/* Divider */
+.divider{height:1px;background:var(--border);margin:12px 0;}
+/* Sec head */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sec-head h3{font-size:15px;font-weight:600;}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="app-header">
   <div class="header-top">
     <div class="app-title">TinyLog 🍼</div>
     <div class="header-actions">
       <div class="caregiver-badge" onclick="switchCaregiver()">
-        <span id="caregiverDot" style="width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
+        <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;display:inline-block;"></span>
         <span id="caregiverName">Parent 1</span>
       </div>
-      <div class="icon-btn theme-btn" onclick="toggleTheme()" title="Toggle dark mode">🌙</div>
-      <div class="icon-btn" onclick="openBabyModal()" title="Baby settings">⚙️</div>
+      <div class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Dark mode">🌙</div>
+      <div class="icon-btn" onclick="openModal('babyModal')" title="Settings">⚙️</div>
     </div>
   </div>
   <div class="baby-bar">
     <div class="baby-ava" id="babyAvatar">👶</div>
     <div class="baby-info">
-      <div class="baby-name-display" id="babyNameDisplay">Set up your baby →</div>
-      <div class="baby-age-display" id="babyAgeDisplay">Tap ⚙️ to get started</div>
+      <div class="baby-name-d" id="babyNameD">Set up your baby →</div>
+      <div class="baby-age-d" id="babyAgeD">Tap ⚙️ to get started</div>
     </div>
   </div>
 </header>
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="nav-item active" onclick="showPage('home',this)"><span class="ni">🏠</span>Home</button>
   <button class="nav-item" onclick="showPage('feeding',this)"><span class="ni">🍼</span>Feed</button>
@@ -409,54 +257,41 @@ input:focus,select:focus{border-color:var(--accent);}
   <button class="nav-item" onclick="showPage('diaper',this)"><span class="ni">🩱</span>Diaper</button>
   <button class="nav-item" onclick="showPage('health',this)"><span class="ni">💊</span>Health</button>
   <button class="nav-item" onclick="showPage('growth',this)"><span class="ni">📈</span>Growth</button>
-  <button class="nav-item" onclick="showPage('milestones',this)"><span class="ni">⭐</span>More</button>
+  <button class="nav-item" onclick="showPage('insights',this)"><span class="ni">🧠</span>Insights</button>
 </nav>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <main class="main">
 
 <!-- ===== HOME ===== -->
 <div class="page active" id="page-home">
-
-  <!-- Predictions -->
-  <div class="pred-strip" id="predStrip">
-    <div class="pred-box" id="predFeed">
+  <div class="pred-strip">
+    <div class="pred-box" id="predFeedBox">
       <div class="pred-label">Next feed in</div>
       <div class="pred-val" id="predFeedVal">—</div>
       <div class="pred-sub" id="predFeedSub">no data yet</div>
     </div>
-    <div class="pred-box" id="predNap">
+    <div class="pred-box" id="predNapBox">
       <div class="pred-label">Next nap in</div>
       <div class="pred-val" id="predNapVal">—</div>
       <div class="pred-sub" id="predNapSub">no data yet</div>
     </div>
   </div>
-
-  <!-- Schedule strip -->
   <div class="card" style="padding:12px 14px;">
     <div class="card-title">Today's schedule</div>
-    <div class="sched-strip" id="schedStrip">
-      <div class="empty" style="padding:8px;font-size:12px;">Log a few feeds & sleeps to see predictions</div>
-    </div>
+    <div class="sched-strip" id="schedStrip"><div class="empty" style="padding:6px;font-size:12px;">Log feeds & sleeps to see predictions</div></div>
   </div>
-
-  <!-- Today stats -->
   <div class="today-grid">
     <div class="today-stat"><div class="ts-val" id="hs-feeds">0</div><div class="ts-lbl">Feeds</div></div>
     <div class="today-stat"><div class="ts-val" id="hs-sleep">0h</div><div class="ts-lbl">Sleep</div></div>
     <div class="today-stat"><div class="ts-val" id="hs-diapers">0</div><div class="ts-lbl">Diapers</div></div>
     <div class="today-stat"><div class="ts-val" id="hs-meds">0</div><div class="ts-lbl">Meds</div></div>
   </div>
-
-  <!-- Recent -->
   <div class="card">
     <div class="sec-head"><h3>Recent activity</h3></div>
     <div class="log-list" id="recentLog"><div class="empty"><div class="empty-icon">✨</div>Nothing logged yet</div></div>
   </div>
-
-  <!-- Quick log -->
   <div class="card">
     <div class="card-title">Quick log</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
@@ -472,8 +307,7 @@ input:focus,select:focus{border-color:var(--accent);}
 <div class="page" id="page-feeding">
   <div class="card">
     <div class="card-title">Log feeding</div>
-    <div class="field">
-      <label class="lbl">Type</label>
+    <div class="field"><label class="lbl">Type</label>
       <div class="tg-group" id="feedTypeGrp">
         <button class="tg pink on" onclick="setTg('feedTypeGrp','Left Breast',this)">◀ Left</button>
         <button class="tg pink" onclick="setTg('feedTypeGrp','Right Breast',this)">Right ▶</button>
@@ -493,35 +327,32 @@ input:focus,select:focus{border-color:var(--accent);}
     </div>
     <div class="field"><label class="lbl">Caregiver</label>
       <div class="tg-group" id="fCareGrp">
-        <button class="tg on" onclick="setTg('fCareGrp','Parent 1',this)">Parent 1</button>
-        <button class="tg" onclick="setTg('fCareGrp','Parent 2',this)">Parent 2</button>
+        <button class="tg on" id="fCare1" onclick="setTg('fCareGrp',S.baby.p1||'Parent 1',this)">Parent 1</button>
+        <button class="tg" id="fCare2" onclick="setTg('fCareGrp',S.baby.p2||'Parent 2',this)">Parent 2</button>
       </div>
     </div>
     <div class="field"><label class="lbl">Notes</label><input type="text" id="fNotes" placeholder="e.g. fussy, good latch…"></div>
     <button class="btn btn-pink btn-full" onclick="logFeeding()">Log Feeding</button>
   </div>
   <div class="card">
-    <div class="sec-head"><h3>Feeding log</h3><span class="pill pill-pink" id="feedCountPill">0 today</span></div>
+    <div class="sec-head"><h3>Feeding log</h3><span class="pill pill-pink" id="feedPill">0 today</span></div>
     <div class="log-list" id="feedLog"><div class="empty"><div class="empty-icon">🍼</div>No feeds logged</div></div>
   </div>
 </div>
 
 <!-- ===== SLEEP ===== -->
 <div class="page" id="page-sleep">
-  <!-- Active sleep timer -->
   <div id="activeSlpCard" style="display:none;" class="sleep-timer-card">
-    <div class="sleep-label">Currently sleeping</div>
+    <div style="font-size:12px;color:var(--purple);opacity:.7;">Currently sleeping</div>
     <div class="sleep-big" id="slpTimerDisp">00:00:00</div>
     <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
       <button class="btn btn-purple btn-sm" onclick="stopSleep()">Wake up</button>
       <button class="btn btn-ghost btn-sm" onclick="cancelSleep()">Cancel</button>
     </div>
   </div>
-
   <div class="card" id="slpFormCard">
     <div class="card-title">Log sleep</div>
-    <div class="field">
-      <label class="lbl">Type</label>
+    <div class="field"><label class="lbl">Type</label>
       <div class="tg-group" id="slpTypeGrp">
         <button class="tg purple on" onclick="setTg('slpTypeGrp','Night Sleep',this)">🌙 Night</button>
         <button class="tg purple" onclick="setTg('slpTypeGrp','Nap',this)">☀️ Nap</button>
@@ -543,15 +374,8 @@ input:focus,select:focus{border-color:var(--accent);}
       <button class="btn btn-ghost btn-sm" onclick="logSleep()">Save manually</button>
     </div>
   </div>
-
-  <!-- Sleep predictions -->
-  <div class="card" id="slpPredCard">
-    <div class="card-title">Sleep predictions</div>
-    <div id="slpPredContent"><div class="empty" style="padding:10px;font-size:12px;">Log 3+ sleeps to unlock predictions</div></div>
-  </div>
-
   <div class="card">
-    <div class="sec-head"><h3>Sleep log</h3><span class="pill pill-purple" id="slpCountPill">0 today</span></div>
+    <div class="sec-head"><h3>Sleep log</h3><span class="pill pill-purple" id="slpPill">0 today</span></div>
     <div class="log-list" id="slpLog"><div class="empty"><div class="empty-icon">😴</div>No sleeps logged</div></div>
   </div>
 </div>
@@ -560,17 +384,15 @@ input:focus,select:focus{border-color:var(--accent);}
 <div class="page" id="page-diaper">
   <div class="card">
     <div class="card-title">Log diaper</div>
-    <div class="field">
-      <label class="lbl">Type</label>
+    <div class="field"><label class="lbl">Type</label>
       <div class="tg-group" id="dpTypeGrp">
-        <button class="tg blue on" onclick="setTg('dpTypeGrp','Wet',this)">💧 Wet</button>
-        <button class="tg blue" onclick="setTg('dpTypeGrp','Dirty',this)">💩 Dirty</button>
-        <button class="tg blue" onclick="setTg('dpTypeGrp','Mixed',this)">🔄 Mixed</button>
-        <button class="tg blue" onclick="setTg('dpTypeGrp','Dry',this)">✅ Dry</button>
+        <button class="tg blue on" onclick="setTg('dpTypeGrp','Wet',this);showStool(false)">💧 Wet</button>
+        <button class="tg blue" onclick="setTg('dpTypeGrp','Dirty',this);showStool(true)">💩 Dirty</button>
+        <button class="tg blue" onclick="setTg('dpTypeGrp','Mixed',this);showStool(true)">🔄 Mixed</button>
+        <button class="tg blue" onclick="setTg('dpTypeGrp','Dry',this);showStool(false)">✅ Dry</button>
       </div>
     </div>
-    <div id="stoolOptions" style="display:none;" class="field">
-      <label class="lbl">Stool color</label>
+    <div id="stoolOpts" style="display:none;" class="field"><label class="lbl">Stool color</label>
       <div class="tg-group" id="stoolGrp">
         <button class="tg on" onclick="setTg('stoolGrp','Yellow',this)">🟡 Yellow</button>
         <button class="tg" onclick="setTg('stoolGrp','Green',this)">🟢 Green</button>
@@ -583,46 +405,38 @@ input:focus,select:focus{border-color:var(--accent);}
       <div class="field"><label class="lbl">Date</label><input type="date" id="dpDate"></div>
       <div class="field"><label class="lbl">Time</label><input type="time" id="dpTime"></div>
     </div>
-    <div class="field"><label class="lbl">Notes (rash, texture…)</label><input type="text" id="dpNotes" placeholder="Any observations…"></div>
+    <div class="field"><label class="lbl">Notes</label><input type="text" id="dpNotes" placeholder="rash, texture…"></div>
     <button class="btn btn-blue btn-full" onclick="logDiaper()">Log Diaper</button>
   </div>
   <div class="card">
-    <div class="sec-head"><h3>Diaper log</h3><span class="pill pill-blue" id="dpCountPill">0 today</span></div>
+    <div class="sec-head"><h3>Diaper log</h3><span class="pill pill-blue" id="dpPill">0 today</span></div>
     <div class="log-list" id="dpLog"><div class="empty"><div class="empty-icon">🩱</div>No diapers logged</div></div>
   </div>
 </div>
 
-<!-- ===== HEALTH (medicine + vaccines) ===== -->
+<!-- ===== HEALTH ===== -->
 <div class="page" id="page-health">
-
-  <!-- Medicine log form -->
   <div class="card">
     <div class="card-title">Log medicine</div>
     <div class="row2">
-      <div class="field"><label class="lbl">Medicine name</label><input type="text" id="medName" placeholder="e.g. Paracetamol"></div>
-      <div class="field"><label class="lbl">Dose</label><input type="text" id="medDose" placeholder="e.g. 2.5ml"></div>
+      <div class="field"><label class="lbl">Medicine</label><input type="text" id="medName" placeholder="Paracetamol"></div>
+      <div class="field"><label class="lbl">Dose</label><input type="text" id="medDose" placeholder="2.5ml"></div>
     </div>
     <div class="row2">
       <div class="field"><label class="lbl">Date & Time</label><input type="datetime-local" id="medDT"></div>
-      <div class="field"><label class="lbl">Next dose in (hrs)</label><input type="number" id="medNext" placeholder="6" min="0" max="48"></div>
+      <div class="field"><label class="lbl">Next dose (hrs)</label><input type="number" id="medNext" placeholder="6" min="0" max="48"></div>
     </div>
-    <div class="field"><label class="lbl">Reason / Notes</label><input type="text" id="medNotes" placeholder="fever, pain…"></div>
+    <div class="field"><label class="lbl">Reason</label><input type="text" id="medNotes" placeholder="fever, pain…"></div>
     <button class="btn btn-accent btn-full" onclick="logMed()">Log Medicine</button>
   </div>
-
-  <!-- Active medicine reminders -->
   <div id="medReminders"></div>
-
-  <!-- Medicine log -->
   <div class="card">
-    <div class="sec-head"><h3>Medicine log</h3><span class="pill pill-accent" id="medCountPill">0 today</span></div>
+    <div class="sec-head"><h3>Medicine log</h3><span class="pill pill-accent" id="medPill">0 today</span></div>
     <div class="log-list" id="medLog"><div class="empty"><div class="empty-icon">💊</div>No medicines logged</div></div>
   </div>
-
-  <!-- WHO Vaccination Schedule -->
   <div class="card">
     <div class="card-title">WHO vaccination schedule</div>
-    <div class="vacc-list" id="vaccList"></div>
+    <div id="vaccList"></div>
   </div>
 </div>
 
@@ -651,36 +465,79 @@ input:focus,select:focus{border-color:var(--accent);}
     <canvas id="growthCanvas" height="180"></canvas>
     <div class="log-list" style="margin-top:10px;" id="grLog"><div class="empty"><div class="empty-icon">📏</div>No measurements yet</div></div>
   </div>
-</div>
-
-<!-- ===== MORE (milestones) ===== -->
-<div class="page" id="page-milestones">
   <div class="card">
     <div class="card-title">Milestones</div>
-    <div class="tg-group" style="margin-bottom:12px;" id="msFilterGrp">
+    <div class="tg-group" style="margin-bottom:10px;" id="msFilterGrp">
       <button class="tg on" onclick="setTg('msFilterGrp','all',this);renderMilestones()">All</button>
       <button class="tg" onclick="setTg('msFilterGrp','achieved',this);renderMilestones()">✓ Done</button>
       <button class="tg" onclick="setTg('msFilterGrp','pending',this);renderMilestones()">Pending</button>
     </div>
     <div class="ms-grid" id="msGrid"></div>
   </div>
-  <div class="card">
-    <div class="card-title">Add custom milestone</div>
-    <div class="row2">
-      <div class="field"><label class="lbl">Name</label><input type="text" id="msName" placeholder="First tooth…"></div>
-      <div class="field"><label class="lbl">Icon (emoji)</label><input type="text" id="msIcon" placeholder="🦷" maxlength="2"></div>
-    </div>
-    <div class="row2">
-      <div class="field"><label class="lbl">Date achieved</label><input type="date" id="msDt"></div>
-      <div class="field"><label class="lbl">Notes</label><input type="text" id="msNote" placeholder="Details…"></div>
-    </div>
-    <button class="btn btn-accent btn-sm" onclick="addCustomMs()">Add Milestone</button>
+</div>
+
+<!-- ===== AI INSIGHTS ===== -->
+<div class="page" id="page-insights">
+
+  <div class="ai-hero">
+    <div class="ai-hero-icon">🧠</div>
+    <h2>AI Baby Insights</h2>
+    <p>Powered by Claude — understands your baby's patterns and flags what matters</p>
   </div>
+
+  <!-- API Key -->
+  <div class="apikey-card" id="apiKeyCard">
+    <div class="apikey-label">🔑 Anthropic API Key required</div>
+    <div class="apikey-input-row">
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-…">
+      <button class="btn btn-purple btn-sm" onclick="saveApiKey()">Save</button>
+    </div>
+    <div class="apikey-note">Your key is stored only in this browser. Get one free at console.anthropic.com</div>
+  </div>
+
+  <!-- Period selector -->
+  <div class="period-tabs" id="periodTabs">
+    <button class="period-tab active" onclick="setPeriod('day',this)">Today</button>
+    <button class="period-tab" onclick="setPeriod('week',this)">Week</button>
+    <button class="period-tab" onclick="setPeriod('month',this)">Month</button>
+    <button class="period-tab" onclick="setPeriod('custom',this)">Custom</button>
+  </div>
+
+  <div class="custom-range" id="customRange">
+    <div class="row2">
+      <div class="field"><label class="lbl">From</label><input type="date" id="customFrom"></div>
+      <div class="field"><label class="lbl">To</label><input type="date" id="customTo"></div>
+    </div>
+  </div>
+
+  <button class="btn btn-purple btn-full" onclick="generateInsights()" id="generateBtn" style="margin-bottom:12px;">
+    ✨ Generate AI Summary
+  </button>
+
+  <!-- Summary output -->
+  <div id="summaryOutput" style="display:none;">
+    <div class="ai-summary-card" id="summaryCard">
+      <!-- Filled by JS -->
+    </div>
+    <div class="pdf-btn-row">
+      <button class="btn btn-accent btn-sm" onclick="exportPDF()">📄 Export PDF Report</button>
+      <button class="btn btn-ghost btn-sm" onclick="copyInsights()">📋 Copy Text</button>
+    </div>
+  </div>
+
+  <!-- Raw stats (always visible after generation) -->
+  <div id="rawStats" style="display:none;">
+    <div class="card" id="rawStatsCard">
+      <div class="card-title">Period statistics</div>
+      <div id="rawStatsContent"></div>
+    </div>
+  </div>
+
 </div>
 
 </main>
 
-<!-- BABY SETUP MODAL -->
+<!-- BABY MODAL -->
 <div class="modal-wrap" id="babyModal">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -698,7 +555,7 @@ input:focus,select:focus{border-color:var(--accent);}
       </div>
     </div>
     <div class="field"><label class="lbl">Parent 1 name</label><input type="text" id="mP1" placeholder="Mum, Dad…"></div>
-    <div class="field"><label class="lbl">Parent 2 name</label><input type="text" id="mP2" placeholder="Partner, Grandma…"></div>
+    <div class="field"><label class="lbl">Parent 2 name</label><input type="text" id="mP2" placeholder="Partner…"></div>
     <div style="display:flex;gap:8px;margin-top:4px;">
       <button class="btn btn-ghost" style="flex:1;" onclick="closeModal('babyModal')">Cancel</button>
       <button class="btn btn-accent" style="flex:1;" onclick="saveBaby()">Save</button>
@@ -707,40 +564,40 @@ input:focus,select:focus{border-color:var(--accent);}
 </div>
 
 <script>
-// ======= STATE =======
+// ========== STATE ==========
 let S = {
   baby:{name:'',dob:'',gender:'',p1:'Parent 1',p2:'Parent 2'},
-  caregiver:'Parent 1',
-  theme:'light',
+  caregiver:'Parent 1',theme:'light',apiKey:'',
   feedings:[],sleeps:[],diapers:[],meds:[],growths:[],
-  milestones:[],customMs:[],
-  activeSleep:null
+  milestones:[],customMs:[],activeSleep:null
 };
+let currentPeriod='day';
+let lastSummaryText='';
+let slpInterval=null;
 
-const WHO_VACCINES = [
+const WHO_VACCINES=[
   {id:'v01',name:'BCG',disease:'Tuberculosis',age:'Birth',ageM:0},
   {id:'v02',name:'HepB (1st)',disease:'Hepatitis B',age:'Birth',ageM:0},
   {id:'v03',name:'OPV-0',disease:'Polio',age:'Birth',ageM:0},
-  {id:'v04',name:'DTP-HepB-Hib (1st)',disease:'Diphtheria, Tetanus, Pertussis, HepB, Hib',age:'6 weeks',ageM:1.5},
+  {id:'v04',name:'DTP-HepB-Hib (1st)',disease:'DTP, HepB, Hib',age:'6 weeks',ageM:1.5},
   {id:'v05',name:'OPV (1st)',disease:'Polio',age:'6 weeks',ageM:1.5},
   {id:'v06',name:'PCV (1st)',disease:'Pneumococcal',age:'6 weeks',ageM:1.5},
   {id:'v07',name:'Rotavirus (1st)',disease:'Rotavirus',age:'6 weeks',ageM:1.5},
-  {id:'v08',name:'DTP-HepB-Hib (2nd)',disease:'Diphtheria, Tetanus, Pertussis',age:'10 weeks',ageM:2.5},
+  {id:'v08',name:'DTP-HepB-Hib (2nd)',disease:'DTP, HepB, Hib',age:'10 weeks',ageM:2.5},
   {id:'v09',name:'OPV (2nd)',disease:'Polio',age:'10 weeks',ageM:2.5},
-  {id:'v10',name:'DTP-HepB-Hib (3rd)',disease:'Diphtheria, Tetanus, Pertussis',age:'14 weeks',ageM:3.5},
+  {id:'v10',name:'DTP-HepB-Hib (3rd)',disease:'DTP, HepB, Hib',age:'14 weeks',ageM:3.5},
   {id:'v11',name:'OPV (3rd)',disease:'Polio',age:'14 weeks',ageM:3.5},
   {id:'v12',name:'PCV (2nd)',disease:'Pneumococcal',age:'14 weeks',ageM:3.5},
   {id:'v13',name:'IPV',disease:'Inactivated Polio',age:'14 weeks',ageM:3.5},
   {id:'v14',name:'Measles (1st)',disease:'Measles',age:'9 months',ageM:9},
   {id:'v15',name:'MMR (1st)',disease:'Measles, Mumps, Rubella',age:'12 months',ageM:12},
   {id:'v16',name:'PCV booster',disease:'Pneumococcal',age:'12 months',ageM:12},
-  {id:'v17',name:'Meningococcal',disease:'Meningitis A',age:'12 months',ageM:12},
-  {id:'v18',name:'MMR (2nd)',disease:'Measles, Mumps, Rubella',age:'15–18 months',ageM:15},
-  {id:'v19',name:'DTP booster',disease:'Diphtheria, Tetanus, Pertussis',age:'18 months',ageM:18},
-  {id:'v20',name:'Typhoid',disease:'Typhoid',age:'2 years',ageM:24},
+  {id:'v17',name:'MMR (2nd)',disease:'Measles, Mumps, Rubella',age:'15–18 months',ageM:15},
+  {id:'v18',name:'DTP booster',disease:'DTP',age:'18 months',ageM:18},
+  {id:'v19',name:'Typhoid',disease:'Typhoid',age:'2 years',ageM:24},
 ];
 
-const MILESTONES_PRESET = [
+const MILESTONES_PRESET=[
   {id:'m1',icon:'😊',name:'First smile',ageHint:'4–8 wks'},
   {id:'m2',icon:'🗣️',name:'First coo',ageHint:'6–8 wks'},
   {id:'m3',icon:'🙆',name:'Holds head up',ageHint:'2–3 mo'},
@@ -753,80 +610,47 @@ const MILESTONES_PRESET = [
   {id:'m10',icon:'👋',name:'Waves bye-bye',ageHint:'9–10 mo'},
   {id:'m11',icon:'🚶',name:'First steps',ageHint:'9–12 mo'},
   {id:'m12',icon:'💬',name:'First word',ageHint:'10–14 mo'},
-  {id:'m13',icon:'🖐️',name:'Pincer grasp',ageHint:'8–10 mo'},
-  {id:'m14',icon:'👀',name:'Eye contact',ageHint:'1–2 mo'},
-  {id:'m15',icon:'🏃',name:'Runs steadily',ageHint:'18–24 mo'},
-  {id:'m16',icon:'📚',name:'Turns book pages',ageHint:'12–18 mo'},
 ];
 
-// ======= PERSIST =======
-function load(){try{const d=localStorage.getItem('tinylog2');if(d)S={...S,...JSON.parse(d)};}catch(e){}}
-function save(){localStorage.setItem('tinylog2',JSON.stringify(S));}
+// ========== PERSIST ==========
+function load(){try{const d=localStorage.getItem('tinylog3');if(d)S={...S,...JSON.parse(d)};}catch(e){}}
+function save(){localStorage.setItem('tinylog3',JSON.stringify(S));}
 
-// ======= UTILS =======
+// ========== UTILS ==========
 const $=id=>document.getElementById(id);
 const now=()=>new Date();
 const todayStr=()=>now().toISOString().slice(0,10);
-const dtLocalStr=(d=now())=>{const z=d.getTimezoneOffset()*60000;return new Date(d-z).toISOString().slice(0,16);}
+const dtLocal=(d=now())=>new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
 const fmtTime=d=>new Date(d).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-const fmtDT=d=>new Date(d).toLocaleDateString([],{month:'short',day:'numeric'})+' '+fmtTime(d);
+const fmtDate=d=>new Date(d).toLocaleDateString([],{month:'short',day:'numeric'});
+const fmtDT=d=>fmtDate(d)+' '+fmtTime(d);
 const fmtDur=ms=>{const m=Math.round(ms/60000);return m<60?m+'m':`${Math.floor(m/60)}h ${m%60}m`;};
 const isToday=ts=>new Date(ts).toISOString().slice(0,10)===todayStr();
 
-function toast(msg){
+function toast(msg,dur=2400){
   const t=$('toast');t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2200);
+  setTimeout(()=>t.classList.remove('show'),dur);
 }
+function setNow(dId,tId){$(dId).value=todayStr();$(tId).value=now().toTimeString().slice(0,5);}
+function setDTNow(id){$(id).value=dtLocal();}
 
-function setNow(dateId,timeId){
-  $(dateId).value=todayStr();
-  $(timeId).value=now().toTimeString().slice(0,5);
-}
-function setDTNow(id){$(id).value=dtLocalStr();}
+// ========== THEME ==========
+function applyTheme(){document.documentElement.setAttribute('data-theme',S.theme);$('themeBtn').textContent=S.theme==='dark'?'☀️':'🌙';}
+function toggleTheme(){S.theme=S.theme==='light'?'dark':'light';applyTheme();save();}
 
-// ======= THEME =======
-function applyTheme(){
-  document.documentElement.setAttribute('data-theme',S.theme);
-  $('toast'); // keep ref
-}
-function toggleTheme(){
-  S.theme=S.theme==='light'?'dark':'light';
-  applyTheme();save();
-  document.querySelector('.theme-btn').textContent=S.theme==='dark'?'☀️':'🌙';
-}
-
-// ======= CAREGIVER =======
+// ========== CAREGIVER ==========
 function switchCaregiver(){
   S.caregiver=S.caregiver===S.baby.p1?S.baby.p2:S.baby.p1;
-  save();updateCaregiverUI();
+  save();updateBabyHeader();
 }
-function updateCaregiverUI(){
+function updateBabyHeader(){
   $('caregiverName').textContent=S.caregiver||'Parent 1';
-  // sync feed caregiver toggles
-  const grp=$('fCareGrp');
-  if(grp){
-    grp.querySelectorAll('.tg').forEach(b=>b.classList.remove('on'));
-    grp.querySelectorAll('.tg').forEach(b=>{if(b.textContent.trim()===S.caregiver)b.classList.add('on');});
-  }
-}
-
-// ======= BABY =======
-function openBabyModal(){
-  $('mBabyName').value=S.baby.name;
-  $('mBabyDob').value=S.baby.dob;
-  $('mBabyGender').value=S.baby.gender;
-  $('mP1').value=S.baby.p1||'';
-  $('mP2').value=S.baby.p2||'';
-  openModal('babyModal');
-}
-function saveBaby(){
-  S.baby.name=$('mBabyName').value.trim()||'Baby';
-  S.baby.dob=$('mBabyDob').value;
-  S.baby.gender=$('mBabyGender').value;
-  S.baby.p1=$('mP1').value.trim()||'Parent 1';
-  S.baby.p2=$('mP2').value.trim()||'Parent 2';
-  if(!S.caregiver||S.caregiver==='Parent 1')S.caregiver=S.baby.p1;
-  save();updateBabyHeader();closeModal('babyModal');renderAll();
+  $('babyAvatar').textContent=S.baby.gender==='girl'?'👧':S.baby.gender==='boy'?'👦':'👶';
+  $('babyNameD').textContent=S.baby.name||'Set up your baby →';
+  $('babyAgeD').textContent=babyAgeStr();
+  const p1=S.baby.p1||'Parent 1',p2=S.baby.p2||'Parent 2';
+  if($('fCare1')){$('fCare1').textContent=p1;$('fCare1').setAttribute('onclick',`setTg('fCareGrp','${p1}',this)`);}
+  if($('fCare2')){$('fCare2').textContent=p2;$('fCare2').setAttribute('onclick',`setTg('fCareGrp','${p2}',this)`);}
 }
 function babyAgeStr(){
   if(!S.baby.dob)return'Set birthday to see age';
@@ -841,518 +665,541 @@ function babyAgeMonths(){
   if(!S.baby.dob)return 0;
   return Math.floor((now()-new Date(S.baby.dob))/2629800000);
 }
-function genderEmoji(){
-  if(S.baby.gender==='girl')return'👧';
-  if(S.baby.gender==='boy')return'👦';
-  return'👶';
-}
-function updateBabyHeader(){
-  $('babyAvatar').textContent=genderEmoji();
-  $('babyNameDisplay').textContent=S.baby.name||'Set up your baby →';
-  $('babyAgeDisplay').textContent=babyAgeStr();
-  updateCaregiverUI();
-  // also update caregiver toggles with real names
-  const grp=$('fCareGrp');
-  if(grp){
-    const btns=grp.querySelectorAll('.tg');
-    if(btns[0])btns[0].textContent=S.baby.p1||'Parent 1';
-    if(btns[1])btns[1].textContent=S.baby.p2||'Parent 2';
-  }
-}
 
-// ======= MODALS =======
+// ========== MODALS ==========
 function openModal(id){$(id).classList.add('open');}
 function closeModal(id){$(id).classList.remove('open');}
-
-// ======= TOGGLES =======
-function setTg(grpId,val,btn){
-  const c=btn.className.match(/\b(pink|blue|green|purple|accent)\b/)?.[1]||'';
-  document.getElementById(grpId).querySelectorAll('.tg').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  // store value on group element
-  document.getElementById(grpId).dataset.val=val;
+function saveBaby(){
+  S.baby.name=$('mBabyName').value.trim()||'Baby';
+  S.baby.dob=$('mBabyDob').value;
+  S.baby.gender=$('mBabyGender').value;
+  S.baby.p1=$('mP1').value.trim()||'Parent 1';
+  S.baby.p2=$('mP2').value.trim()||'Parent 2';
+  if(!S.caregiver||S.caregiver==='Parent 1')S.caregiver=S.baby.p1;
+  save();updateBabyHeader();closeModal('babyModal');
 }
-function tgVal(grpId){return document.getElementById(grpId)?.dataset?.val||'';}
 
-// ======= PAGE NAV =======
+// ========== TOGGLES ==========
+function setTg(grpId,val,btn){
+  const color=btn.className.match(/\b(pink|blue|green|purple)\b/)?.[1]||'';
+  $(`${grpId}`).querySelectorAll('.tg').forEach(b=>{b.classList.remove('on');});
+  btn.classList.add('on');
+  $(`${grpId}`).dataset.val=val;
+}
+const tgVal=id=>$(id)?.dataset?.val||'';
+function showStool(show){$('stoolOpts').style.display=show?'block':'none';}
+
+// ========== PAGE NAV ==========
 function showPage(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
   $('page-'+name).classList.add('active');
   btn.classList.add('active');
-  if(name==='growth')drawChart();
+  if(name==='growth')setTimeout(drawChart,50);
   if(name==='health')renderVaccines();
   renderAll();
 }
 
-// ======= FEEDING =======
+// ========== FEEDING ==========
 function logFeeding(){
   const d=$('fDate').value,t=$('fTime').value;
   if(!d||!t){toast('Set date & time');return;}
-  S.feedings.unshift({
-    id:Date.now(),type:'feeding',
-    feedType:tgVal('feedTypeGrp')||'Left Breast',
-    date:d,time:t,ts:new Date(d+'T'+t).getTime(),
-    vol:$('fVol').value||'',dur:$('fDur').value||'',
-    notes:$('fNotes').value,
-    caregiver:tgVal('fCareGrp')||S.caregiver
-  });
-  save();renderAll();
-  $('fVol').value='';$('fDur').value='';$('fNotes').value='';
+  S.feedings.unshift({id:Date.now(),feedType:tgVal('feedTypeGrp')||'Left Breast',date:d,time:t,ts:new Date(d+'T'+t).getTime(),vol:$('fVol').value||'',dur:$('fDur').value||'',notes:$('fNotes').value,caregiver:tgVal('fCareGrp')||S.caregiver});
+  save();renderAll();$('fVol').value='';$('fDur').value='';$('fNotes').value='';
   toast('Feeding logged ✓');
 }
 
-// ======= SLEEP =======
-let slpInterval=null;
+// ========== SLEEP ==========
 function startSleepTimer(){
   if(S.activeSleep){toast('Sleep already running');return;}
   S.activeSleep={start:Date.now(),type:tgVal('slpTypeGrp')||'Nap',quality:tgVal('slpQualGrp')||'Good'};
-  save();
-  $('activeSlpCard').style.display='block';
-  $('slpFormCard').style.opacity='.4';
-  slpInterval=setInterval(updateSlpTimer,1000);
+  save();$('activeSlpCard').style.display='block';$('slpFormCard').style.opacity='.4';
+  slpInterval=setInterval(()=>{
+    if(!S.activeSleep)return;
+    const e=Date.now()-S.activeSleep.start;
+    const h=Math.floor(e/3600000),m=Math.floor((e%3600000)/60000),s=Math.floor((e%60000)/1000);
+    $('slpTimerDisp').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  },1000);
   toast('Sleep timer started');
-}
-function updateSlpTimer(){
-  if(!S.activeSleep)return;
-  const e=Date.now()-S.activeSleep.start;
-  const h=Math.floor(e/3600000),m=Math.floor((e%3600000)/60000),s=Math.floor((e%60000)/1000);
-  $('slpTimerDisp').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 function stopSleep(){
   if(!S.activeSleep)return;
   const endTs=Date.now();
-  S.sleeps.unshift({id:endTs,type:'sleep',sleepType:S.activeSleep.type,quality:S.activeSleep.quality,startTs:S.activeSleep.start,endTs,duration:endTs-S.activeSleep.start});
+  S.sleeps.unshift({id:endTs,sleepType:S.activeSleep.type,quality:S.activeSleep.quality,startTs:S.activeSleep.start,endTs,duration:endTs-S.activeSleep.start});
   S.activeSleep=null;clearInterval(slpInterval);
-  save();resetSlpUI();renderAll();toast('Sleep logged ✓');
+  save();$('activeSlpCard').style.display='none';$('slpFormCard').style.opacity='1';
+  renderAll();toast('Sleep logged ✓');
 }
-function cancelSleep(){S.activeSleep=null;clearInterval(slpInterval);save();resetSlpUI();}
-function resetSlpUI(){
-  $('activeSlpCard').style.display='none';
-  $('slpFormCard').style.opacity='1';
-}
+function cancelSleep(){S.activeSleep=null;clearInterval(slpInterval);save();$('activeSlpCard').style.display='none';$('slpFormCard').style.opacity='1';}
 function logSleep(){
   const sv=$('slpStart').value,ev=$('slpEnd').value;
   if(!sv||!ev){toast('Set start & end time');return;}
   const st=new Date(sv).getTime(),et=new Date(ev).getTime();
   if(et<=st){toast('End must be after start');return;}
-  S.sleeps.unshift({id:Date.now(),type:'sleep',sleepType:tgVal('slpTypeGrp')||'Nap',quality:tgVal('slpQualGrp')||'Good',startTs:st,endTs:et,duration:et-st});
+  S.sleeps.unshift({id:Date.now(),sleepType:tgVal('slpTypeGrp')||'Nap',quality:tgVal('slpQualGrp')||'Good',startTs:st,endTs:et,duration:et-st});
   save();renderAll();$('slpStart').value='';$('slpEnd').value='';toast('Sleep logged ✓');
 }
 
-// ======= SLEEP PREDICTIONS =======
-function calcSleepPredictions(){
-  if(S.sleeps.length<3)return null;
-  const gaps=[];
-  const sorted=[...S.sleeps].sort((a,b)=>a.startTs-b.startTs);
-  for(let i=1;i<sorted.length;i++)gaps.push(sorted[i].startTs-sorted[i-1].endTs);
-  const avgGap=gaps.reduce((a,b)=>a+b,0)/gaps.length;
-  const avgDur=sorted.reduce((a,b)=>a+b.duration,0)/sorted.length;
-  const last=sorted[sorted.length-1];
-  const nextNapStart=last.endTs+avgGap;
-  const nextNapEnd=nextNapStart+avgDur;
-  const feedGaps=[];
-  const sortedF=[...S.feedings].sort((a,b)=>a.ts-b.ts);
-  for(let i=1;i<sortedF.length;i++)feedGaps.push(sortedF[i].ts-sortedF[i-1].ts);
-  let nextFeed=null;
-  if(sortedF.length>=2&&feedGaps.length){
-    const avgFG=feedGaps.reduce((a,b)=>a+b,0)/feedGaps.length;
-    nextFeed=new Date(sortedF[sortedF.length-1].ts+avgFG);
-  }
-  return{nextNapStart:new Date(nextNapStart),nextNapEnd:new Date(nextNapEnd),avgDur,avgGap,nextFeed};
-}
-
-function renderSleepPredictions(){
-  const p=calcSleepPredictions();
-  const el=$('slpPredContent');
-  if(!p){el.innerHTML='<div class="empty" style="padding:10px;font-size:12px;">Log 3+ sleeps to unlock predictions</div>';return;}
-  const now2=Date.now();
-  const inMs=p.nextNapStart.getTime()-now2;
-  const inStr=inMs>0?fmtDur(inMs):'now';
-  el.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-    <div style="background:var(--purple-bg);border-radius:var(--r-sm);padding:10px;text-align:center;">
-      <div style="font-size:10px;color:var(--purple);font-weight:600;margin-bottom:4px;">NEXT NAP</div>
-      <div style="font-size:18px;font-weight:600;color:var(--purple);">${fmtTime(p.nextNapStart)}</div>
-      <div style="font-size:10px;color:var(--purple);opacity:.7;">in ${inStr}</div>
-    </div>
-    <div style="background:var(--purple-bg);border-radius:var(--r-sm);padding:10px;text-align:center;">
-      <div style="font-size:10px;color:var(--purple);font-weight:600;margin-bottom:4px;">AVG SLEEP</div>
-      <div style="font-size:18px;font-weight:600;color:var(--purple);">${fmtDur(p.avgDur)}</div>
-      <div style="font-size:10px;color:var(--purple);opacity:.7;">per session</div>
-    </div>
-  </div>`;
-}
-
-// ======= HOME PREDICTIONS =======
-function renderHomePredictions(){
-  const p=calcSleepPredictions();
-  const now2=Date.now();
-  if(p){
-    const napIn=p.nextNapStart.getTime()-now2;
-    const napInStr=napIn>0?fmtDur(napIn):'Now!';
-    const isUrgent=napIn<1800000&&napIn>0;
-    const napBox=$('predNap');
-    napBox.className='pred-box'+(isUrgent?' pred-urgent':'');
-    $('predNapVal').textContent=napInStr;
-    $('predNapSub').textContent='at '+fmtTime(p.nextNapStart);
-
-    if(p.nextFeed){
-      const feedIn=p.nextFeed.getTime()-now2;
-      const feedStr=feedIn>0?fmtDur(feedIn):'Now!';
-      const feedUrgent=feedIn<1800000&&feedIn>0;
-      const fb=$('predFeed');
-      fb.className='pred-box'+(feedUrgent?' pred-urgent':'');
-      $('predFeedVal').textContent=feedStr;
-      $('predFeedSub').textContent='at '+fmtTime(p.nextFeed);
-    }
-  }
-  renderScheduleStrip();
-}
-
-function renderScheduleStrip(){
-  const strip=$('schedStrip');
-  const events=[];
-  const p=calcSleepPredictions();
-  if(p){
-    events.push({time:p.nextNapStart,label:'😴 Nap',isPred:true});
-    if(p.nextFeed)events.push({time:p.nextFeed,label:'🍼 Feed',isPred:true});
-    // Add a few more future naps
-    const gap=p.avgGap+p.avgDur;
-    for(let i=1;i<4;i++){
-      events.push({time:new Date(p.nextNapStart.getTime()+(gap*i)),label:'😴 Nap',isPred:true});
-    }
-  }
-  // Add recent actuals
-  S.feedings.filter(f=>isToday(f.ts)).forEach(f=>events.push({time:new Date(f.ts),label:'🍼 '+f.feedType.split(' ')[0],isPred:false}));
-  S.sleeps.filter(s=>isToday(s.startTs)).forEach(s=>events.push({time:new Date(s.startTs),label:'😴 '+fmtDur(s.duration),isPred:false}));
-  S.diapers.filter(d=>isToday(d.ts)).forEach(d=>events.push({time:new Date(d.ts),label:'🩱 '+d.diaperType,isPred:false}));
-  events.sort((a,b)=>a.time-b.time);
-  if(!events.length){strip.innerHTML='<div class="empty" style="padding:8px;font-size:12px;">Log a few feeds & sleeps to see your schedule</div>';return;}
-  const nowMs=Date.now();
-  let nextIdx=-1;
-  for(let i=0;i<events.length;i++){if(events[i].isPred&&events[i].time.getTime()>nowMs){nextIdx=i;break;}}
-  strip.innerHTML=events.map((e,i)=>`<div class="sched-pill${i===nextIdx?' next':''}">
-    <div class="sched-time">${fmtTime(e.time)}</div>
-    <div class="sched-act">${e.label}${e.isPred?' *':''}</div>
-  </div>`).join('');
-}
-
-// ======= DIAPER =======
+// ========== DIAPER ==========
 function logDiaper(){
   const d=$('dpDate').value,t=$('dpTime').value;
   if(!d||!t){toast('Set date & time');return;}
   const dt=tgVal('dpTypeGrp')||'Wet';
-  const showStool=dt==='Dirty'||dt==='Mixed';
-  S.diapers.unshift({id:Date.now(),type:'diaper',diaperType:dt,stoolColor:showStool?(tgVal('stoolGrp')||'Yellow'):'',date:d,time:t,ts:new Date(d+'T'+t).getTime(),notes:$('dpNotes').value});
+  S.diapers.unshift({id:Date.now(),diaperType:dt,stoolColor:(dt==='Dirty'||dt==='Mixed')?tgVal('stoolGrp'):'',date:d,time:t,ts:new Date(d+'T'+t).getTime(),notes:$('dpNotes').value});
   save();renderAll();$('dpNotes').value='';toast('Diaper logged ✓');
 }
 
-// ======= MEDICINE =======
+// ========== MEDICINE ==========
 function logMed(){
   const dt=$('medDT').value;
   if(!dt||!$('medName').value){toast('Enter medicine name & time');return;}
-  S.meds.unshift({id:Date.now(),type:'med',name:$('medName').value,dose:$('medDose').value,ts:new Date(dt).getTime(),nextHrs:parseFloat($('medNext').value)||0,notes:$('medNotes').value});
-  save();renderAll();
-  $('medName').value='';$('medDose').value='';$('medNext').value='';$('medNotes').value='';
+  S.meds.unshift({id:Date.now(),name:$('medName').value,dose:$('medDose').value,ts:new Date(dt).getTime(),nextHrs:parseFloat($('medNext').value)||0,notes:$('medNotes').value});
+  save();renderAll();$('medName').value='';$('medDose').value='';$('medNext').value='';$('medNotes').value='';
   toast('Medicine logged ✓');
 }
 
-// ======= GROWTH =======
+// ========== GROWTH ==========
 function logGrowth(){
   const d=$('grDate').value;
   if(!d){toast('Set date');return;}
   const w=$('grWt').value,h=$('grHt').value,hd=$('grHd').value;
   if(!w&&!h&&!hd){toast('Enter at least one measurement');return;}
-  S.growths.push({id:Date.now(),type:'growth',date:d,ts:new Date(d).getTime(),weight:w?parseFloat(w):null,height:h?parseFloat(h):null,head:hd?parseFloat(hd):null,notes:$('grNotes').value});
+  S.growths.push({id:Date.now(),date:d,ts:new Date(d).getTime(),weight:w?parseFloat(w):null,height:h?parseFloat(h):null,head:hd?parseFloat(hd):null,notes:$('grNotes').value});
   S.growths.sort((a,b)=>a.ts-b.ts);
   save();renderAll();drawChart();
   $('grWt').value='';$('grHt').value='';$('grHd').value='';$('grNotes').value='';
   toast('Measurement saved ✓');
 }
 
-// ======= GROWTH CHART =======
+// ========== GROWTH CHART ==========
 function drawChart(){
   const canvas=$('growthCanvas');if(!canvas)return;
   const metric=tgVal('grMetricGrp')||'weight';
   const ctx=canvas.getContext('2d');
   const W=canvas.parentElement.clientWidth||320;
-  canvas.width=W;canvas.height=180;
-  ctx.clearRect(0,0,W,180);
-  const data=S.growths.filter(g=>g[metric]!==null&&g[metric]!==undefined);
-  const isDark=S.theme==='dark';
-  const textCol=isDark?'#a89484':'#6b5c4e';
-  const gridCol=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
-  const lineCol=isDark?'#3dd68a':'#2db87a';
-  const dotCol=lineCol;
-  if(data.length<2){
-    ctx.fillStyle=textCol;ctx.font='13px DM Sans';ctx.textAlign='center';
-    ctx.fillText('Add 2+ measurements to see chart',W/2,95);return;
-  }
+  canvas.width=W;canvas.height=180;ctx.clearRect(0,0,W,180);
+  const data=S.growths.filter(g=>g[metric]!=null);
+  const dark=S.theme==='dark';
+  const tc=dark?'#a89484':'#6b5c4e',gc=dark?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)',lc=dark?'#3dd68a':'#2db87a';
+  if(data.length<2){ctx.fillStyle=tc;ctx.font='13px DM Sans';ctx.textAlign='center';ctx.fillText('Add 2+ measurements to see chart',W/2,95);return;}
   const vals=data.map(g=>g[metric]);
-  const minV=Math.min(...vals)*0.97,maxV=Math.max(...vals)*1.03;
-  const pad={l:44,r:12,t:12,b:28};
-  const cW=W-pad.l-pad.r,cH=180-pad.t-pad.b;
-  const tx=i=>pad.l+(i/(data.length-1))*cW;
-  const ty=v=>pad.t+cH-((v-minV)/(maxV-minV))*cH;
-  // grid
+  const minV=Math.min(...vals)*.97,maxV=Math.max(...vals)*1.03;
+  const pad={l:44,r:12,t:12,b:28},cW=W-pad.l-pad.r,cH=180-pad.t-pad.b;
+  const tx=i=>pad.l+(i/(data.length-1))*cW,ty=v=>pad.t+cH-((v-minV)/(maxV-minV))*cH;
   for(let i=0;i<=4;i++){
-    const y=pad.t+i*cH/4;
-    ctx.strokeStyle=gridCol;ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();
-    const lv=(minV+(4-i)/4*(maxV-minV)).toFixed(1);
-    ctx.fillStyle=textCol;ctx.font='10px DM Sans';ctx.textAlign='right';
-    ctx.fillText(lv,pad.l-4,y+3);
+    const y=pad.t+i*cH/4;ctx.strokeStyle=gc;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();
+    ctx.fillStyle=tc;ctx.font='10px DM Sans';ctx.textAlign='right';ctx.fillText((minV+(4-i)/4*(maxV-minV)).toFixed(1),pad.l-4,y+3);
   }
-  // fill
   const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+cH);
-  grad.addColorStop(0,isDark?'rgba(61,214,138,0.2)':'rgba(45,184,122,0.15)');
-  grad.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.beginPath();ctx.moveTo(tx(0),ty(vals[0]));
-  for(let i=1;i<data.length;i++)ctx.lineTo(tx(i),ty(vals[i]));
-  ctx.lineTo(tx(data.length-1),pad.t+cH);ctx.lineTo(tx(0),pad.t+cH);
-  ctx.closePath();ctx.fillStyle=grad;ctx.fill();
-  // line
-  ctx.beginPath();ctx.strokeStyle=lineCol;ctx.lineWidth=2.5;ctx.lineJoin='round';
-  ctx.moveTo(tx(0),ty(vals[0]));
-  for(let i=1;i<data.length;i++)ctx.lineTo(tx(i),ty(vals[i]));
-  ctx.stroke();
-  // dots + labels
-  data.forEach((g,i)=>{
-    ctx.beginPath();ctx.arc(tx(i),ty(vals[i]),4,0,Math.PI*2);
-    ctx.fillStyle=dotCol;ctx.fill();
-    ctx.strokeStyle=isDark?'#181818':'#fff';ctx.lineWidth=2;ctx.stroke();
-    const lbl=new Date(g.date).toLocaleDateString([],{month:'short',day:'numeric'});
-    ctx.fillStyle=textCol;ctx.font='9px DM Sans';ctx.textAlign='center';
-    ctx.fillText(lbl,tx(i),180-4);
-  });
+  grad.addColorStop(0,dark?'rgba(61,214,138,0.2)':'rgba(45,184,122,0.15)');grad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.beginPath();ctx.moveTo(tx(0),ty(vals[0]));for(let i=1;i<data.length;i++)ctx.lineTo(tx(i),ty(vals[i]));
+  ctx.lineTo(tx(data.length-1),pad.t+cH);ctx.lineTo(tx(0),pad.t+cH);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();ctx.strokeStyle=lc;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.moveTo(tx(0),ty(vals[0]));
+  for(let i=1;i<data.length;i++)ctx.lineTo(tx(i),ty(vals[i]));ctx.stroke();
+  data.forEach((g,i)=>{ctx.beginPath();ctx.arc(tx(i),ty(vals[i]),4,0,Math.PI*2);ctx.fillStyle=lc;ctx.fill();ctx.strokeStyle=dark?'#181818':'#fff';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle=tc;ctx.font='9px DM Sans';ctx.textAlign='center';ctx.fillText(new Date(g.date).toLocaleDateString([],{month:'short',day:'numeric'}),tx(i),180-4);});
 }
 
-// ======= VACCINES =======
+// ========== VACCINES ==========
 function renderVaccines(){
   const ageM=babyAgeMonths();
-  const list=$('vaccList');
-  list.innerHTML=WHO_VACCINES.map(v=>{
-    const done=S.milestones.includes(v.id);
-    const due=!done&&v.ageM<=ageM;
-    const upcoming=!done&&v.ageM>ageM;
-    const statusCls=done?'vs-done':due?'vs-due':'vs-upcoming';
-    const statusTxt=done?'✓ Done':due?'⚠ Due':'Upcoming';
-    const dotColor=done?'var(--green)':due?'var(--amber)':'var(--border2)';
-    return`<div class="vacc-item">
-      <div class="vacc-dot" style="background:${dotColor}"></div>
-      <div class="vacc-body">
-        <div class="vacc-name">${v.name}</div>
-        <div class="vacc-age">${v.age} · ${v.disease}</div>
-      </div>
-      <span class="vacc-status ${statusCls}">${statusTxt}</span>
-      <span class="vacc-check" onclick="toggleVacc('${v.id}')">${done?'☑':'☐'}</span>
-    </div>`;
+  $('vaccList').innerHTML=WHO_VACCINES.map(v=>{
+    const done=S.milestones.includes(v.id),due=!done&&v.ageM<=ageM;
+    const sc=done?'vs-done':due?'vs-due':'vs-upcoming',st=done?'✓ Done':due?'⚠ Due':'Upcoming';
+    const dc=done?'var(--green)':due?'var(--amber)':'var(--border2)';
+    return`<div class="vacc-item"><div class="vacc-dot" style="background:${dc}"></div><div style="flex:1;"><div class="vacc-name">${v.name}</div><div class="vacc-age">${v.age} · ${v.disease}</div></div><span class="vacc-status ${sc}">${st}</span><span style="cursor:pointer;font-size:18px;" onclick="toggleVacc('${v.id}')">${done?'☑':'☐'}</span></div>`;
   }).join('');
 }
-function toggleVacc(id){
-  const i=S.milestones.indexOf(id);
-  if(i>-1)S.milestones.splice(i,1);else S.milestones.push(id);
-  save();renderVaccines();toast(S.milestones.includes(id)?'Vaccine marked done':'Vaccine unmarked');
-}
+function toggleVacc(id){const i=S.milestones.indexOf(id);if(i>-1)S.milestones.splice(i,1);else S.milestones.push(id);save();renderVaccines();}
 
-// ======= MILESTONES =======
+// ========== MILESTONES ==========
 function renderMilestones(){
-  const filter=tgVal('msFilterGrp')||'all';
+  const f=tgVal('msFilterGrp')||'all';
   const all=[...MILESTONES_PRESET,...S.customMs];
-  const filtered=all.filter(m=>{
-    const done=S.milestones.includes(m.id);
-    if(filter==='achieved')return done;
-    if(filter==='pending')return!done;
-    return true;
-  });
-  const grid=$('msGrid');
-  if(!filtered.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">⭐</div>None found</div>';return;}
-  grid.innerHTML=filtered.map(m=>{
-    const done=S.milestones.includes(m.id);
-    return`<div class="ms-card${done?' done':''}" onclick="toggleMs('${m.id}')">
-      <div class="ms-icon">${m.icon}</div>
-      <div class="ms-name">${m.name}</div>
-      <div class="ms-hint">${m.ageHint||''}</div>
-      <div class="ms-badge">${done?'✓ Achieved!':'tap to mark'}</div>
-    </div>`;
-  }).join('');
+  const filtered=all.filter(m=>{const d=S.milestones.includes(m.id);return f==='achieved'?d:f==='pending'?!d:true;});
+  $('msGrid').innerHTML=filtered.map(m=>{
+    const d=S.milestones.includes(m.id);
+    return`<div class="ms-card${d?' done':''}" onclick="toggleMs('${m.id}')"><div class="ms-icon">${m.icon}</div><div class="ms-name">${m.name}</div><div class="ms-hint">${m.ageHint||''}</div><div class="ms-badge">${d?'✓ Achieved!':'tap to mark'}</div></div>`;
+  }).join('')||'<div class="empty" style="grid-column:1/-1"><div class="empty-icon">⭐</div>None found</div>';
 }
-function toggleMs(id){
-  const i=S.milestones.indexOf(id);
-  if(i>-1)S.milestones.splice(i,1);else S.milestones.push(id);
-  save();renderMilestones();
-}
-function addCustomMs(){
-  const name=$('msName').value.trim();
-  if(!name){toast('Enter a name');return;}
-  const id='c'+Date.now();
-  S.customMs.push({id,icon:$('msIcon').value.trim()||'🌟',name,ageHint:$('msDt').value||'',notes:$('msNote').value});
-  S.milestones.push(id);
-  save();renderMilestones();
-  $('msName').value='';$('msIcon').value='';$('msNote').value='';
-  toast('Milestone added ✓');
-}
+function toggleMs(id){const i=S.milestones.indexOf(id);if(i>-1)S.milestones.splice(i,1);else S.milestones.push(id);save();renderMilestones();}
 
-// ======= DELETE =======
+// ========== DELETE ==========
 function del(type,id){
-  if(type==='feeding')S.feedings=S.feedings.filter(e=>e.id!==id);
-  else if(type==='sleep')S.sleeps=S.sleeps.filter(e=>e.id!==id);
-  else if(type==='diaper')S.diapers=S.diapers.filter(e=>e.id!==id);
-  else if(type==='med')S.meds=S.meds.filter(e=>e.id!==id);
-  else if(type==='growth')S.growths=S.growths.filter(e=>e.id!==id);
+  if(type==='f')S.feedings=S.feedings.filter(e=>e.id!==id);
+  else if(type==='s')S.sleeps=S.sleeps.filter(e=>e.id!==id);
+  else if(type==='d')S.diapers=S.diapers.filter(e=>e.id!==id);
+  else if(type==='m')S.meds=S.meds.filter(e=>e.id!==id);
+  else if(type==='g')S.growths=S.growths.filter(e=>e.id!==id);
   save();renderAll();
 }
 
-// ======= LOG ITEM HTML =======
-function li(type,id,iconBg,icon,main,sub,timeStr){
-  return`<div class="log-item">
-    <div class="log-icon" style="background:${iconBg}">${icon}</div>
-    <div class="log-body"><div class="log-main">${main}</div><div class="log-sub">${sub}</div></div>
-    <div class="log-right"><span class="log-time">${timeStr}</span><button class="del-btn" onclick="del('${type}',${id})">✕</button></div>
-  </div>`;
+// ========== LOG ITEM ==========
+function li(type,id,ibg,icon,main,sub,time){
+  return`<div class="log-item"><div class="log-icon" style="background:${ibg}">${icon}</div><div class="log-body"><div class="log-main">${main}</div><div class="log-sub">${sub}</div></div><div class="log-right"><span class="log-time">${time}</span><button class="del-btn" onclick="del('${type}',${id})">✕</button></div></div>`;
 }
 
-// ======= RENDER ALL =======
+// ========== PREDICTIONS ==========
+function calcPredictions(){
+  if(S.sleeps.length<3)return null;
+  const ss=[...S.sleeps].sort((a,b)=>a.startTs-b.startTs);
+  const gaps=[],durs=[];
+  for(let i=1;i<ss.length;i++){gaps.push(ss[i].startTs-ss[i-1].endTs);durs.push(ss[i].duration);}
+  const avgGap=gaps.reduce((a,b)=>a+b,0)/gaps.length;
+  const avgDur=ss.reduce((a,b)=>a+b.duration,0)/ss.length;
+  const last=ss[ss.length-1];
+  const nextNap=new Date(last.endTs+avgGap);
+  let nextFeed=null;
+  const sf=[...S.feedings].sort((a,b)=>a.ts-b.ts);
+  if(sf.length>=2){
+    const fg=[];for(let i=1;i<sf.length;i++)fg.push(sf[i].ts-sf[i-1].ts);
+    const avgFG=fg.reduce((a,b)=>a+b,0)/fg.length;
+    nextFeed=new Date(sf[sf.length-1].ts+avgFG);
+  }
+  return{nextNap,avgDur,avgGap,nextFeed};
+}
+
+// ========== RENDER ALL ==========
 function renderAll(){
   updateBabyHeader();
-  renderHomePredictions();
-  renderSleepPredictions();
-
-  // ---- HOME stats ----
-  const todayF=S.feedings.filter(f=>isToday(f.ts));
-  const todayS=S.sleeps.filter(s=>isToday(s.startTs));
-  const todayD=S.diapers.filter(d=>isToday(d.ts));
-  const todayM=S.meds.filter(m=>isToday(m.ts));
-  $('hs-feeds').textContent=todayF.length;
-  $('hs-diapers').textContent=todayD.length;
-  $('hs-meds').textContent=todayM.length;
-  const totalSlpMs=todayS.reduce((a,s)=>a+s.duration,0);
-  const sh=Math.floor(totalSlpMs/3600000),sm=Math.floor((totalSlpMs%3600000)/60000);
+  // Home stats
+  const tF=S.feedings.filter(f=>isToday(f.ts));
+  const tS=S.sleeps.filter(s=>isToday(s.startTs));
+  const tD=S.diapers.filter(d=>isToday(d.ts));
+  const tM=S.meds.filter(m=>isToday(m.ts));
+  $('hs-feeds').textContent=tF.length;
+  $('hs-diapers').textContent=tD.length;
+  $('hs-meds').textContent=tM.length;
+  const tSms=tS.reduce((a,s)=>a+s.duration,0);
+  const sh=Math.floor(tSms/3600000),sm=Math.floor((tSms%3600000)/60000);
   $('hs-sleep').textContent=sh>0?`${sh}h${sm}m`:sm+'m';
-
-  // ---- RECENT ----
-  const allEvents=[
-    ...S.feedings.map(e=>({...e,_t:'feeding'})),
-    ...S.sleeps.map(e=>({...e,_t:'sleep'})),
-    ...S.diapers.map(e=>({...e,_t:'diaper'})),
-    ...S.meds.map(e=>({...e,_t:'med'})),
-    ...S.growths.map(e=>({...e,_t:'growth'}))
-  ].sort((a,b)=>(b.ts||b.startTs||b.endTs||0)-(a.ts||a.startTs||a.endTs||0)).slice(0,8);
-
+  // Predictions
+  const p=calcPredictions();
+  const n2=Date.now();
+  if(p){
+    const ni=p.nextNap.getTime()-n2,ns=ni>0?fmtDur(ni):'Now!',nu=ni<1800000&&ni>0;
+    $('predNapBox').className='pred-box'+(nu?' pred-urgent':'');
+    $('predNapVal').textContent=ns;$('predNapSub').textContent='at '+fmtTime(p.nextNap);
+    if(p.nextFeed){const fi=p.nextFeed.getTime()-n2,fs=fi>0?fmtDur(fi):'Now!',fu=fi<1800000&&fi>0;$('predFeedBox').className='pred-box'+(fu?' pred-urgent':'');$('predFeedVal').textContent=fs;$('predFeedSub').textContent='at '+fmtTime(p.nextFeed);}
+    // Schedule strip
+    const evts=[];
+    if(p.nextFeed)evts.push({time:p.nextFeed,label:'🍼 Feed',pred:true});
+    evts.push({time:p.nextNap,label:'😴 Nap',pred:true});
+    const gap=p.avgGap+p.avgDur;
+    for(let i=1;i<3;i++)evts.push({time:new Date(p.nextNap.getTime()+gap*i),label:'😴 Nap',pred:true});
+    tF.forEach(f=>evts.push({time:new Date(f.ts),label:'🍼',pred:false}));
+    tS.forEach(s=>evts.push({time:new Date(s.startTs),label:'😴',pred:false}));
+    tD.forEach(d=>evts.push({time:new Date(d.ts),label:'🩱',pred:false}));
+    evts.sort((a,b)=>a.time-b.time);
+    let nextIdx=-1;for(let i=0;i<evts.length;i++){if(evts[i].pred&&evts[i].time>n2){nextIdx=i;break;}}
+    $('schedStrip').innerHTML=evts.map((e,i)=>`<div class="sched-pill${i===nextIdx?' next':''}"><div class="sched-time">${fmtTime(e.time)}</div><div class="sched-act">${e.label}${e.pred?' *':''}</div></div>`).join('');
+  }
+  // Recent
+  const all=[...S.feedings.map(e=>({...e,_t:'f'})),...S.sleeps.map(e=>({...e,_t:'s'})),...S.diapers.map(e=>({...e,_t:'d'})),...S.meds.map(e=>({...e,_t:'m'})),...S.growths.map(e=>({...e,_t:'g'}))].sort((a,b)=>(b.ts||b.startTs||0)-(a.ts||a.startTs||0)).slice(0,8);
   const rl=$('recentLog');
-  if(!allEvents.length){rl.innerHTML='<div class="empty"><div class="empty-icon">✨</div>Nothing logged yet</div>';}
-  else rl.innerHTML=allEvents.map(e=>{
-    if(e._t==='feeding')return li('feeding',e.id,'var(--pink-bg)','🍼',e.feedType+(e.vol?` · ${e.vol}ml`:''),e.dur?e.dur+'min'+(e.caregiver?' · '+e.caregiver:''):(e.caregiver||''),fmtTime(e.ts));
-    if(e._t==='sleep')return li('sleep',e.id,'var(--purple-bg)','😴',e.sleepType+' · '+fmtDur(e.duration),`${fmtTime(e.startTs)} – ${fmtTime(e.endTs)}`,new Date(e.startTs).toLocaleDateString([],{month:'short',day:'numeric'}));
-    if(e._t==='diaper')return li('diaper',e.id,'var(--blue-bg)','🩱',e.diaperType+(e.stoolColor?' · '+e.stoolColor:''),e.notes||'',fmtTime(e.ts));
-    if(e._t==='med')return li('med',e.id,'var(--amber-bg)','💊',e.name+(e.dose?' · '+e.dose:''),e.notes||'',fmtTime(e.ts));
-    if(e._t==='growth')return li('growth',e.id,'var(--green-bg)','📏',[e.weight?e.weight+'kg':null,e.height?e.height+'cm':null,e.head?e.head+'cm':null].filter(Boolean).join(' · '),e.notes||'',e.date);
+  if(!all.length)rl.innerHTML='<div class="empty"><div class="empty-icon">✨</div>Nothing logged yet</div>';
+  else rl.innerHTML=all.map(e=>{
+    if(e._t==='f')return li('f',e.id,'var(--pink-bg)','🍼',e.feedType+(e.vol?` · ${e.vol}ml`:''),e.dur?e.dur+'min':'',fmtTime(e.ts));
+    if(e._t==='s')return li('s',e.id,'var(--purple-bg)','😴',e.sleepType+' · '+fmtDur(e.duration),fmtTime(e.startTs)+' – '+fmtTime(e.endTs),fmtDate(e.startTs));
+    if(e._t==='d')return li('d',e.id,'var(--blue-bg)','🩱',e.diaperType+(e.stoolColor?' · '+e.stoolColor:''),e.notes||'',fmtTime(e.ts));
+    if(e._t==='m')return li('m',e.id,'var(--amber-bg)','💊',e.name+(e.dose?' · '+e.dose:''),e.notes||'',fmtTime(e.ts));
+    if(e._t==='g')return li('g',e.id,'var(--green-bg)','📏',[e.weight?e.weight+'kg':null,e.height?e.height+'cm':null,e.head?e.head+'cm':null].filter(Boolean).join(' · '),e.notes||'',e.date);
     return'';
   }).join('');
-
-  // ---- FEED LOG ----
-  $('feedCountPill').textContent=todayF.length+' today';
-  const fl=$('feedLog');
-  if(!S.feedings.length)fl.innerHTML='<div class="empty"><div class="empty-icon">🍼</div>No feeds logged</div>';
-  else fl.innerHTML=S.feedings.slice(0,20).map(e=>li('feeding',e.id,'var(--pink-bg)','🍼',
-    e.feedType+(e.vol?` · ${e.vol}ml`:''),(e.dur?e.dur+'min':'')+' '+(e.caregiver||''),fmtTime(e.ts))).join('');
-
-  // ---- SLEEP LOG ----
-  $('slpCountPill').textContent=todayS.length+' today';
-  const sl=$('slpLog');
-  if(!S.sleeps.length)sl.innerHTML='<div class="empty"><div class="empty-icon">😴</div>No sleeps logged</div>';
-  else sl.innerHTML=S.sleeps.slice(0,15).map(e=>li('sleep',e.id,'var(--purple-bg)','😴',
-    e.sleepType+' · '+fmtDur(e.duration),(e.quality||'')+' · '+fmtTime(e.startTs)+' – '+fmtTime(e.endTs),
-    new Date(e.startTs).toLocaleDateString([],{month:'short',day:'numeric'}))).join('');
-
-  // ---- DIAPER LOG ----
-  $('dpCountPill').textContent=todayD.length+' today';
-  const dl=$('dpLog');
-  if(!S.diapers.length)dl.innerHTML='<div class="empty"><div class="empty-icon">🩱</div>No diapers logged</div>';
-  else dl.innerHTML=S.diapers.slice(0,20).map(e=>li('diaper',e.id,'var(--blue-bg)','🩱',
-    e.diaperType+(e.stoolColor?' · '+e.stoolColor:''),e.notes||'',fmtDT(e.ts))).join('');
-
-  // ---- MED REMINDERS ----
-  const now2=Date.now();
-  const activeMeds=S.meds.filter(m=>m.nextHrs&&(m.ts+m.nextHrs*3600000)>now2);
-  const mr=$('medReminders');
-  mr.innerHTML=activeMeds.map(m=>{
-    const due=new Date(m.ts+m.nextHrs*3600000);
-    const inMs=due.getTime()-now2;
-    return`<div class="med-active"><div style="display:flex;justify-content:space-between;align-items:center;">
-      <div><div style="font-size:13px;font-weight:600;color:var(--amber);">💊 ${m.name}${m.dose?' · '+m.dose:''}</div>
-      <div style="font-size:11px;color:var(--text2);margin-top:2px;">Next dose in ${fmtDur(inMs)} (${fmtTime(due)})</div></div>
-      <span style="font-size:20px;">⏰</span></div></div>`;
-  }).join('');
-
-  // ---- MED LOG ----
-  $('medCountPill').textContent=todayM.length+' today';
-  const ml=$('medLog');
-  if(!S.meds.length)ml.innerHTML='<div class="empty"><div class="empty-icon">💊</div>No medicines logged</div>';
-  else ml.innerHTML=S.meds.slice(0,15).map(e=>li('med',e.id,'var(--amber-bg)','💊',
-    e.name+(e.dose?' · '+e.dose:''),e.notes||'',fmtDT(e.ts))).join('');
-
-  // ---- GROWTH LOG ----
-  const grl=$('grLog');
-  if(!S.growths.length)grl.innerHTML='<div class="empty"><div class="empty-icon">📏</div>No measurements yet</div>';
-  else grl.innerHTML=[...S.growths].reverse().slice(0,10).map(e=>li('growth',e.id,'var(--green-bg)','📏',
-    [e.weight?e.weight+'kg':null,e.height?e.height+'cm':null,e.head?e.head+'cm HC':null].filter(Boolean).join(' · '),
-    e.notes||'',e.date)).join('');
-
-  // Milestones
+  // Feed log
+  $('feedPill').textContent=tF.length+' today';
+  $('feedLog').innerHTML=S.feedings.length?S.feedings.slice(0,20).map(e=>li('f',e.id,'var(--pink-bg)','🍼',e.feedType+(e.vol?` · ${e.vol}ml`:''),e.dur?e.dur+'min '+e.caregiver:e.caregiver||'',fmtTime(e.ts))).join(''):'<div class="empty"><div class="empty-icon">🍼</div>No feeds logged</div>';
+  // Sleep log
+  $('slpPill').textContent=tS.length+' today';
+  $('slpLog').innerHTML=S.sleeps.length?S.sleeps.slice(0,15).map(e=>li('s',e.id,'var(--purple-bg)','😴',e.sleepType+' · '+fmtDur(e.duration),(e.quality||'')+' · '+fmtTime(e.startTs)+' – '+fmtTime(e.endTs),fmtDate(e.startTs))).join(''):'<div class="empty"><div class="empty-icon">😴</div>No sleeps logged</div>';
+  // Diaper log
+  $('dpPill').textContent=tD.length+' today';
+  $('dpLog').innerHTML=S.diapers.length?S.diapers.slice(0,20).map(e=>li('d',e.id,'var(--blue-bg)','🩱',e.diaperType+(e.stoolColor?' · '+e.stoolColor:''),e.notes||'',fmtDT(e.ts))).join(''):'<div class="empty"><div class="empty-icon">🩱</div>No diapers logged</div>';
+  // Med reminders
+  const n3=Date.now();
+  $('medReminders').innerHTML=S.meds.filter(m=>m.nextHrs&&(m.ts+m.nextHrs*3600000)>n3).map(m=>{const due=new Date(m.ts+m.nextHrs*3600000),inMs=due-n3;return`<div class="med-active"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:13px;font-weight:600;color:var(--amber);">💊 ${m.name}${m.dose?' · '+m.dose:''}</div><div style="font-size:11px;color:var(--text2);">Next dose in ${fmtDur(inMs)} (${fmtTime(due)})</div></div><span style="font-size:20px;">⏰</span></div></div>`;}).join('');
+  // Med log
+  $('medPill').textContent=tM.length+' today';
+  $('medLog').innerHTML=S.meds.length?S.meds.slice(0,15).map(e=>li('m',e.id,'var(--amber-bg)','💊',e.name+(e.dose?' · '+e.dose:''),e.notes||'',fmtDT(e.ts))).join(''):'<div class="empty"><div class="empty-icon">💊</div>No medicines logged</div>';
+  // Growth log
+  $('grLog').innerHTML=S.growths.length?[...S.growths].reverse().slice(0,10).map(e=>li('g',e.id,'var(--green-bg)','📏',[e.weight?e.weight+'kg':null,e.height?e.height+'cm':null,e.head?e.head+'cm HC':null].filter(Boolean).join(' · '),e.notes||'',e.date)).join(''):'<div class="empty"><div class="empty-icon">📏</div>No measurements yet</div>';
   renderMilestones();
 }
 
-// ======= INIT =======
-function init(){
-  load();
-  applyTheme();
-  if(S.theme==='dark')document.querySelector('.theme-btn').textContent='☀️';
-
-  // Set defaults
-  setNow('fDate','fTime');
-  setNow('dpDate','dpTime');
-  setDTNow('medDT');
-  $('grDate').value=todayStr();
-  $('msDt').value=todayStr();
-  const n=dtLocalStr();
-  $('slpStart').value=n;$('slpEnd').value=n;
-
-  // Init toggle values
-  document.getElementById('feedTypeGrp').dataset.val='Left Breast';
-  document.getElementById('fCareGrp').dataset.val=S.caregiver||'Parent 1';
-  document.getElementById('slpTypeGrp').dataset.val='Night Sleep';
-  document.getElementById('slpQualGrp').dataset.val='Good';
-  document.getElementById('dpTypeGrp').dataset.val='Wet';
-  document.getElementById('stoolGrp').dataset.val='Yellow';
-  document.getElementById('grMetricGrp').dataset.val='weight';
-  document.getElementById('msFilterGrp').dataset.val='all';
-
-  // Diaper stool visibility
-  document.getElementById('dpTypeGrp').querySelectorAll('.tg').forEach(b=>{
-    b.addEventListener('click',()=>{
-      const v=tgVal('dpTypeGrp');
-      $('stoolOptions').style.display=(v==='Dirty'||v==='Mixed')?'block':'none';
-    });
-  });
-
-  // Resume sleep timer if active
-  if(S.activeSleep){
-    $('activeSlpCard').style.display='block';
-    $('slpFormCard').style.opacity='.4';
-    slpInterval=setInterval(updateSlpTimer,1000);
+// ========== AI INSIGHTS ==========
+function saveApiKey(){
+  const k=$('apiKeyInput').value.trim();
+  if(!k.startsWith('sk-')){toast('Invalid key — should start with sk-');return;}
+  S.apiKey=k;save();$('apiKeyCard').style.display='none';toast('API key saved ✓');
+}
+function setPeriod(p,btn){
+  currentPeriod=p;
+  document.querySelectorAll('.period-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  $('customRange').classList.toggle('show',p==='custom');
+}
+function getPeriodRange(){
+  const n=now(),d=new Date(n);
+  if(currentPeriod==='day'){const s=new Date(n);s.setHours(0,0,0,0);return{start:s,end:n,label:'Today ('+n.toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'})+')'};
+  }else if(currentPeriod==='week'){const s=new Date(n);s.setDate(n.getDate()-7);return{start:s,end:n,label:'Last 7 days'};
+  }else if(currentPeriod==='month'){const s=new Date(n);s.setDate(n.getDate()-30);return{start:s,end:n,label:'Last 30 days'};
+  }else{
+    const f=$('customFrom').value,t=$('customTo').value;
+    if(!f||!t){toast('Set custom date range');return null;}
+    const s=new Date(f),e=new Date(t);e.setHours(23,59,59,999);
+    return{start:s,end:e,label:`${f} to ${t}`};
   }
-
-  // Show baby modal on first load
-  if(!S.baby.name)setTimeout(openBabyModal,500);
-
-  renderAll();
-  renderVaccines();
-
-  // Refresh predictions every minute
-  setInterval(renderHomePredictions,60000);
+}
+function buildDataSummary(range){
+  const{start,end}=range;
+  const inRange=(ts)=>new Date(ts)>=start&&new Date(ts)<=end;
+  const feeds=S.feedings.filter(f=>inRange(f.ts));
+  const sleeps=S.sleeps.filter(s=>inRange(s.startTs));
+  const diapers=S.diapers.filter(d=>inRange(d.ts));
+  const meds=S.meds.filter(m=>inRange(m.ts));
+  const growths=S.growths.filter(g=>inRange(g.ts));
+  const days=Math.max(1,Math.ceil((end-start)/86400000));
+  // Feed stats
+  const totalVol=feeds.reduce((a,f)=>a+(parseFloat(f.vol)||0),0);
+  const avgFeedGap=feeds.length>1?feeds.slice(0,-1).map((f,i)=>feeds[i+1].ts-f.ts).reduce((a,b)=>a+b,0)/(feeds.length-1)/60000:null;
+  const feedTypes={};feeds.forEach(f=>{feedTypes[f.feedType]=(feedTypes[f.feedType]||0)+1;});
+  // Sleep stats
+  const totalSleep=sleeps.reduce((a,s)=>a+s.duration,0);
+  const avgSleepPerDay=totalSleep/days;
+  const nightSleeps=sleeps.filter(s=>s.sleepType==='Night Sleep');
+  const naps=sleeps.filter(s=>s.sleepType==='Nap');
+  const poorSleeps=sleeps.filter(s=>s.quality==='Poor'||s.quality==='Restless');
+  // Diaper stats
+  const wet=diapers.filter(d=>d.diaperType==='Wet'||d.diaperType==='Mixed').length;
+  const dirty=diapers.filter(d=>d.diaperType==='Dirty'||d.diaperType==='Mixed').length;
+  const redStool=diapers.filter(d=>d.stoolColor==='Red').length;
+  const blackStool=diapers.filter(d=>d.stoolColor==='Black'&&S.baby.dob&&(Date.now()-new Date(S.baby.dob))>7*86400000).length;
+  // Growth
+  const latestGrowth=growths.length?growths[growths.length-1]:null;
+  const growthChange=growths.length>1?{wt:(growths[growths.length-1].weight||0)-(growths[0].weight||0),ht:(growths[growths.length-1].height||0)-(growths[0].height||0)}:null;
+  // Vaccines due
+  const ageM=babyAgeMonths();
+  const vaccDue=WHO_VACCINES.filter(v=>!S.milestones.includes(v.id)&&v.ageM<=ageM).length;
+  return{
+    period:{days,label:range.label},
+    baby:{name:S.baby.name||'Baby',ageStr:babyAgeStr(),dob:S.baby.dob},
+    feeding:{count:feeds.length,perDay:(feeds.length/days).toFixed(1),totalVolMl:Math.round(totalVol),avgVolPerFeed:feeds.filter(f=>f.vol).length?Math.round(totalVol/feeds.filter(f=>f.vol).length):null,avgGapMin:avgFeedGap?Math.round(avgFeedGap):null,types:feedTypes,longestGapHrs:feeds.length>1?Math.round(Math.max(...feeds.slice(0,-1).map((f,i)=>(feeds[i+1].ts-f.ts)/3600000))*10)/10:null},
+    sleep:{count:sleeps.length,totalHrs:Math.round(totalSleep/3600000*10)/10,avgPerDayHrs:Math.round(avgSleepPerDay/3600000*10)/10,nightSleepCount:nightSleeps.length,napCount:naps.length,avgNapDurMin:naps.length?Math.round(naps.reduce((a,n)=>a+n.duration,0)/naps.length/60000):null,avgNightDurHrs:nightSleeps.length?Math.round(nightSleeps.reduce((a,n)=>a+n.duration,0)/nightSleeps.length/3600000*10)/10:null,poorQualityCount:poorSleeps.length},
+    diaper:{count:diapers.length,perDay:(diapers.length/days).toFixed(1),wet,dirty,redStool,blackStool,rashes:diapers.filter(d=>d.notes&&d.notes.toLowerCase().includes('rash')).length},
+    medicine:{count:meds.length,list:[...new Set(meds.map(m=>m.name))].join(', ')||'none'},
+    growth:{count:growths.length,latest:latestGrowth,change:growthChange},
+    vaccines:{due:vaccDue},
+    milestones:{achieved:S.milestones.filter(id=>!id.startsWith('v')).length,total:MILESTONES_PRESET.length+S.customMs.length}
+  };
 }
 
+async function generateInsights(){
+  if(!S.apiKey){toast('Add your API key above first','3000');$('apiKeyCard').style.display='block';return;}
+  const range=getPeriodRange();if(!range)return;
+  const stats=buildDataSummary(range);
+  const totalEntries=stats.feeding.count+stats.sleep.count+stats.diaper.count+stats.medicine.count;
+  if(totalEntries===0){toast('No data found for this period','3000');return;}
+  $('summaryOutput').style.display='block';
+  $('rawStats').style.display='block';
+  $('summaryCard').innerHTML=`<div class="ai-generating"><div class="ai-spinner"></div><div class="ai-gen-label">Claude is analyzing ${totalEntries} log entries…</div></div>`;
+  renderRawStats(stats);
+  const prompt=`You are a warm, knowledgeable pediatric health assistant helping new parents understand their baby's patterns.
+
+Baby: ${stats.baby.name}, ${stats.baby.ageStr}
+Period analyzed: ${stats.period.label} (${stats.period.days} days)
+
+DATA SUMMARY:
+FEEDING: ${stats.feeding.count} feeds (${stats.feeding.perDay}/day avg). Total volume: ${stats.feeding.totalVolMl}ml. Avg volume per feed: ${stats.feeding.avgVolPerFeed||'not recorded'}ml. Avg gap between feeds: ${stats.feeding.avgGapMin||'N/A'} min. Longest gap: ${stats.feeding.longestGapHrs||'N/A'} hrs. Feed types: ${JSON.stringify(stats.feeding.types)}.
+
+SLEEP: ${stats.sleep.count} sessions, ${stats.sleep.totalHrs}h total (${stats.sleep.avgPerDayHrs}h/day). Night sleeps: ${stats.sleep.nightSleepCount} sessions (avg ${stats.sleep.avgNightDurHrs||'N/A'}h each). Naps: ${stats.sleep.napCount} (avg ${stats.sleep.avgNapDurMin||'N/A'} min each). Poor quality: ${stats.sleep.poorQualityCount} sessions.
+
+DIAPERS: ${stats.diaper.count} total (${stats.diaper.perDay}/day). Wet: ${stats.diaper.wet}, Dirty: ${stats.diaper.dirty}. Red stool alerts: ${stats.diaper.redStool}. Black stool alerts (post-newborn): ${stats.diaper.blackStool}. Rash notes: ${stats.diaper.rashes}.
+
+MEDICINE: ${stats.medicine.count} doses. Medicines: ${stats.medicine.list}.
+
+GROWTH: ${stats.growth.count} measurements this period. Latest: ${stats.growth.latest?`Weight ${stats.growth.latest.weight||'N/A'}kg, Height ${stats.growth.latest.height||'N/A'}cm, Head ${stats.growth.latest.head||'N/A'}cm`:'none recorded'}. Change: ${stats.growth.change?`Weight +${stats.growth.change.wt.toFixed(2)}kg, Height +${stats.growth.change.ht.toFixed(1)}cm`:'only 1 measurement'}.
+
+VACCINES: ${stats.vaccines.due} vaccine(s) due based on WHO schedule and baby's age.
+MILESTONES: ${stats.milestones.achieved}/${stats.milestones.total} achieved.
+
+Please provide a structured, warm analysis with these EXACT sections (use these exact headers):
+
+## 🍼 Feeding Patterns
+Analyze feeding frequency, volume, gaps, and type distribution. Note if frequency/volume is appropriate for age.
+
+## 😴 Sleep Analysis  
+Analyze total sleep, nap patterns, night sleep quality. Note what's healthy vs concerning.
+
+## 🩱 Diaper Health
+Assess diaper frequency (normal is 6-8 wet/day for infants). Flag any color concerns.
+
+## 📈 Growth & Development
+Comment on measurements if available, milestone progress.
+
+## 💊 Medicine & Health Flags
+Note any medicine patterns, frequency. Vaccines due.
+
+## ✅ What's Going Well
+2-3 positives to encourage the parents.
+
+## ⚠️ Watch Points
+Any patterns to monitor. Flag urgently if red stool (post-newborn), black stool, <6 wet diapers/day, very long feeding gaps (>4hrs in newborn), or very low sleep.
+
+## 💡 Tips for This Week
+2-3 specific, actionable suggestions based on the data.
+
+Keep tone warm and supportive. Be specific with numbers. Do NOT recommend specific medical treatment — suggest consulting a pediatrician for any concerns. Keep each section concise (2-4 sentences).`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
+    });
+    if(!res.ok){const err=await res.json();throw new Error(err.error?.message||'API error');}
+    const data=await res.json();
+    const text=data.content[0].text;
+    lastSummaryText=text;
+    renderSummary(text,stats,range.label);
+  }catch(e){
+    $('summaryCard').innerHTML=`<div style="padding:16px;color:var(--red);font-size:13px;">⚠️ Error: ${e.message}<br><br>Check your API key is valid and has credits.</div>`;
+    console.error(e);
+  }
+}
+
+function renderSummary(text,stats,periodLabel){
+  const sections=text.split(/^## /m).filter(s=>s.trim());
+  const icons={'🍼':'var(--pink-bg)','😴':'var(--purple-bg)','🩱':'var(--blue-bg)','📈':'var(--green-bg)','💊':'var(--amber-bg)','✅':'var(--green-bg)','⚠️':'var(--red-bg)','💡':'var(--accent-bg)'};
+  const html=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div><div style="font-family:'DM Serif Display',serif;font-size:18px;">${stats.baby.name}'s Report</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">${periodLabel} · ${stats.baby.ageStr}</div></div>
+      <div style="font-size:24px;">🧠</div>
+    </div>
+    ${sections.map(sec=>{
+      const firstLine=sec.split('\n')[0].trim();
+      const body=sec.split('\n').slice(1).join('\n').trim();
+      const iconMatch=firstLine.match(/^([\u{1F300}-\u{1FFFF}✅⚠️💡])/u);
+      const ic=iconMatch?iconMatch[1]:'📋';
+      const bg=icons[ic]||'var(--bg2)';
+      const isWarn=ic==='⚠️',isOk=ic==='✅';
+      const borderColor=isWarn?'var(--red)':isOk?'var(--green)':'var(--border)';
+      return`<div style="background:${bg};border:1px solid ${borderColor};border-radius:12px;padding:12px;margin-bottom:8px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">${firstLine}</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;">${body.replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</div>
+      </div>`;
+    }).join('')}
+    <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px;font-style:italic;">Generated by Claude AI · Not a substitute for professional medical advice</div>
+  `;
+  $('summaryCard').innerHTML=html;
+}
+
+function renderRawStats(s){
+  $('rawStatsContent').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div style="background:var(--pink-bg);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--pink)">${s.feeding.count}</div><div style="font-size:10px;color:var(--text3);">Feeds (${s.feeding.perDay}/day)</div></div>
+      <div style="background:var(--purple-bg);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--purple)">${s.sleep.totalHrs}h</div><div style="font-size:10px;color:var(--text3);">Total sleep</div></div>
+      <div style="background:var(--blue-bg);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--blue)">${s.diaper.count}</div><div style="font-size:10px;color:var(--text3);">Diapers (${s.diaper.wet}W/${s.diaper.dirty}D)</div></div>
+      <div style="background:var(--amber-bg);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--amber)">${s.medicine.count}</div><div style="font-size:10px;color:var(--text3);">Medicine doses</div></div>
+    </div>
+    ${s.growth.latest?`<div style="margin-top:8px;background:var(--green-bg);border-radius:10px;padding:10px;text-align:center;font-size:12px;color:var(--text2);">Latest: ${[s.growth.latest.weight?s.growth.latest.weight+'kg':null,s.growth.latest.height?s.growth.latest.height+'cm':null,s.growth.latest.head?s.growth.latest.head+'cm HC':null].filter(Boolean).join(' · ')}</div>`:''}
+  `;
+}
+
+// ========== PDF EXPORT ==========
+async function exportPDF(){
+  if(!lastSummaryText){toast('Generate a summary first');return;}
+  toast('Building PDF…');
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,ml=18,mr=18,cw=W-ml-mr;
+  let y=20;
+  // Header
+  doc.setFillColor(232,112,58);doc.rect(0,0,W,38,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');doc.setFontSize(22);
+  doc.text('TinyLog Baby Report',ml,20);
+  doc.setFont('helvetica','normal');doc.setFontSize(10);
+  const baby=S.baby.name||'Baby';
+  doc.text(`${baby} · ${babyAgeStr()}`,ml,28);
+  doc.text(`Generated: ${now().toLocaleDateString([],{weekday:'short',year:'numeric',month:'short',day:'numeric'})}`,ml,34);
+  y=48;
+  // Raw stats bar
+  const periodRange=getPeriodRange();
+  const stats=periodRange?buildDataSummary(periodRange):null;
+  if(stats){
+    doc.setFillColor(245,240,235);doc.rect(ml,y,cw,28,'F');
+    doc.setTextColor(100,80,60);doc.setFont('helvetica','bold');doc.setFontSize(9);
+    doc.text('PERIOD SUMMARY: '+stats.period.label,ml+4,y+6);
+    doc.setFont('helvetica','normal');doc.setFontSize(10);
+    const cols=[[`🍼 ${stats.feeding.count} Feeds`,`${stats.feeding.perDay}/day`],[`😴 ${stats.sleep.totalHrs}h Sleep`,`${stats.sleep.avgPerDayHrs}h/day`],[`🩱 ${stats.diaper.count} Diapers`,`${stats.diaper.wet}W/${stats.diaper.dirty}D`],[`💊 ${stats.medicine.count} Med doses`,'']];
+    cols.forEach((c,i)=>{const x=ml+4+(i*(cw/4));doc.setTextColor(40,30,20);doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text(c[0],x,y+14);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(100,80,60);doc.text(c[1],x,y+20);});
+    y+=34;
+  }
+  // AI sections
+  const sections=lastSummaryText.split(/^## /m).filter(s=>s.trim());
+  const sectionColors={'🍼':[255,238,245],'😴':[240,236,255],'🩱':[238,244,255],'📈':[237,250,243],'💊':[255,248,235],'✅':[237,250,243],'⚠️':[255,240,240],'💡':[255,242,235]};
+  for(const sec of sections){
+    const lines=sec.split('\n');
+    const header=lines[0].trim();
+    const body=lines.slice(1).join('\n').trim().replace(/\*\*(.+?)\*\*/g,'$1');
+    const iconMatch=header.match(/^([\u{1F300}-\u{1FFFF}✅⚠️💡])/u);
+    const ic=iconMatch?iconMatch[1]:'📋';
+    const fillColor=sectionColors[ic]||[245,245,245];
+    // Estimate height
+    const wrapped=doc.splitTextToSize(body,cw-8);
+    const boxH=10+wrapped.length*5+4;
+    if(y+boxH>270){doc.addPage();y=20;}
+    doc.setFillColor(...fillColor);
+    doc.roundedRect(ml,y,cw,boxH,3,3,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(30,20,10);
+    doc.text(header,ml+4,y+7);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(80,60,50);
+    doc.text(wrapped,ml+4,y+13);
+    y+=boxH+4;
+  }
+  // Footer
+  doc.setFillColor(232,112,58);doc.rect(0,280,W,17,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','italic');doc.setFontSize(8);
+  doc.text('TinyLog Baby Tracker · AI-generated report · Not a substitute for professional medical advice',ml,288);
+  doc.text(`Page 1 · ${now().toLocaleDateString()}`,W-mr-30,288);
+  doc.save(`tinylog-report-${baby.toLowerCase().replace(/\s/,'-')}-${todayStr()}.pdf`);
+  toast('PDF saved ✓');
+}
+
+function copyInsights(){
+  if(!lastSummaryText){toast('Generate a summary first');return;}
+  navigator.clipboard.writeText(lastSummaryText).then(()=>toast('Copied to clipboard ✓')).catch(()=>toast('Could not copy'));
+}
+
+// ========== INIT ==========
+function init(){
+  load();applyTheme();
+  setNow('fDate','fTime');setNow('dpDate','dpTime');setDTNow('medDT');
+  $('grDate').value=todayStr();
+  const n=dtLocal();$('slpStart').value=n;$('slpEnd').value=n;
+  // Init toggle datasets
+  ['feedTypeGrp','slpTypeGrp','slpQualGrp','dpTypeGrp','stoolGrp','grMetricGrp','msFilterGrp','fCareGrp'].forEach(id=>{
+    const el=$(id);if(el){const first=el.querySelector('.tg.on');if(first)el.dataset.val=first.getAttribute('onclick')?.match(/'([^']+)'/)?.[1]||'';}
+  });
+  if($('feedTypeGrp'))$('feedTypeGrp').dataset.val='Left Breast';
+  if($('slpTypeGrp'))$('slpTypeGrp').dataset.val='Night Sleep';
+  if($('slpQualGrp'))$('slpQualGrp').dataset.val='Good';
+  if($('dpTypeGrp'))$('dpTypeGrp').dataset.val='Wet';
+  if($('stoolGrp'))$('stoolGrp').dataset.val='Yellow';
+  if($('grMetricGrp'))$('grMetricGrp').dataset.val='weight';
+  if($('msFilterGrp'))$('msFilterGrp').dataset.val='all';
+  // API key
+  if(S.apiKey)$('apiKeyCard').style.display='none';
+  else{$('apiKeyInput').value='';$('apiKeyCard').style.display='block';}
+  // Custom date range defaults
+  const from=new Date();from.setDate(from.getDate()-7);
+  $('customFrom').value=from.toISOString().slice(0,10);
+  $('customTo').value=todayStr();
+  // Resume sleep timer
+  if(S.activeSleep){$('activeSlpCard').style.display='block';$('slpFormCard').style.opacity='.4';slpInterval=setInterval(()=>{if(!S.activeSleep)return;const e=Date.now()-S.activeSleep.start,h=Math.floor(e/3600000),m=Math.floor((e%3600000)/60000),s=Math.floor((e%60000)/1000);$('slpTimerDisp').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;},1000);}
+  if(!S.baby.name)setTimeout(()=>openModal('babyModal'),600);
+  renderAll();renderVaccines();
+  setInterval(renderAll,60000);
+}
 init();
 </script>
 </body>
