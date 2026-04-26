@@ -7,6 +7,48 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<!-- Bridge stubs — ensure onclick handlers never throw "not defined"
+     while the ES module is still loading. The module overwrites these. -->
+<script>
+function _waitAndCall(fn, args) {
+  // Poll until the real function is available (module loaded)
+  if (typeof window[fn] === 'function') { window[fn](...args); return; }
+  setTimeout(() => _waitAndCall(fn, args), 80);
+}
+function doLogin()   { _waitAndCall('doLogin',   []); }
+function doSignup()  { _waitAndCall('doSignup',  []); }
+function doGoogle()  { _waitAndCall('doGoogle',  []); }
+function doSignOut() { _waitAndCall('doSignOut', []); }
+function createFamily()   { _waitAndCall('createFamily',   []); }
+function joinFamily()     { _waitAndCall('joinFamily',     []); }
+function saveBabySettings(){ _waitAndCall('saveBabySettings', []); }
+function logFeeding()  { _waitAndCall('logFeeding',  []); }
+function logSleep()    { _waitAndCall('logSleep',    []); }
+function logDiaper()   { _waitAndCall('logDiaper',   []); }
+function logMed()      { _waitAndCall('logMed',      []); }
+function logGrowth()   { _waitAndCall('logGrowth',   []); }
+function startSleepTimer() { _waitAndCall('startSleepTimer', []); }
+function stopSleep()   { _waitAndCall('stopSleep',   []); }
+function cancelSleep() { _waitAndCall('cancelSleep', []); }
+function saveApiKey()  { _waitAndCall('saveApiKey',  []); }
+function generateInsights() { _waitAndCall('generateInsights', []); }
+function exportPDF()   { _waitAndCall('exportPDF',   []); }
+function copyInsights(){ _waitAndCall('copyInsights', []); }
+function toggleTheme() { _waitAndCall('toggleTheme', []); }
+function renderMilestones() { _waitAndCall('renderMilestones', []); }
+function renderVaccines()   { _waitAndCall('renderVaccines',   []); }
+// Parameterised stubs
+function del(col, id)         { _waitAndCall('del', [col, id]); }
+function setTg(g, v, b)       { _waitAndCall('setTg', [g, v, b]); }
+function showStool(s)         { _waitAndCall('showStool', [s]); }
+function drawChart()          { _waitAndCall('drawChart', []); }
+function toggleMs(id)         { _waitAndCall('toggleMs', [id]); }
+function toggleVacc(id)       { _waitAndCall('toggleVacc', [id]); }
+function toggleMilestone(id)  { _waitAndCall('toggleMilestone', [id]); }
+function setPeriod(p, btn)    { _waitAndCall('setPeriod', [p, btn]); }
+function showPage(name, btn)  { _waitAndCall('showPage', [name, btn]); }
+</script>
+
 <!-- Firebase SDKs -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
@@ -14,27 +56,16 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
 import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, onSnapshot, query, orderBy, serverTimestamp, arrayUnion, arrayRemove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 // ─── FIREBASE CONFIG ─── paste yours here after setup ───
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCYcJjI-EifWN9Nc0lWUDTcm64z6gA5SGg",
-  authDomain: "babytracker-8e601.firebaseapp.com",
-  projectId: "babytracker-8e601",
-  storageBucket: "babytracker-8e601.firebasestorage.app",
-  messagingSenderId: "84002664221",
-  appId: "1:84002664221:web:fb8c157e9d9115122a7bf4",
-  measurementId: "G-21Q252EPDL"
+const FB_CONFIG = {
+  apiKey: "REPLACE_WITH_YOUR_API_KEY",
+  authDomain: "REPLACE_WITH_YOUR_AUTH_DOMAIN",
+  projectId: "REPLACE_WITH_YOUR_PROJECT_ID",
+  storageBucket: "REPLACE_WITH_YOUR_STORAGE_BUCKET",
+  messagingSenderId: "REPLACE_WITH_YOUR_MESSAGING_SENDER_ID",
+  appId: "REPLACE_WITH_YOUR_APP_ID"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const app = initializeApp(FB_CONFIG);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
@@ -703,6 +734,7 @@ onAuthStateChanged(auth, async user => {
 
 // Expose needed globals
 window.showPage=showPage;
+window.showScreen=showScreen;
 window.setTg=setTg;
 window.tgVal=tgVal;
 window.toggleTheme=toggleTheme;
@@ -710,6 +742,9 @@ window.drawChart=drawChart;
 window.renderMilestones=renderMilestones;
 window.renderVaccines=renderVaccines;
 window.toggleMilestone=toggleMilestone;
+window.toast=toast;
+// Signal that module has fully loaded
+window._moduleReady=true;
 
 </script>
 
@@ -1182,8 +1217,12 @@ function switchSetupTab(tab, btn){
   document.getElementById('setup'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
 }
 // Auth tab switchers
+// showLogin/showSignup handled by bridge script above
 function showLogin(){ document.getElementById('auth-login').style.display='block'; document.getElementById('auth-signup').style.display='none'; }
 function showSignup(){ document.getElementById('auth-login').style.display='none'; document.getElementById('auth-signup').style.display='block'; }
+// Also expose on window so module can call them
+window.showLogin = showLogin;
+window.showSignup = showSignup;
 
 // Populate settings when navigating to it
 const _origShowPage = window.showPage;
