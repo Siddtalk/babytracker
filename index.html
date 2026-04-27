@@ -164,6 +164,7 @@ function showPage(name,btn){
   btn.classList.add('active');
   if(name==='growth') setTimeout(drawChart,50);
   if(name==='health') renderVaccines();
+  if(name==='insights') setTimeout(updateInsightsModeUI,50);
   renderAll();
 }
 
@@ -646,11 +647,36 @@ function renderAll(){
 // ─── AI INSIGHTS ───
 window._m_saveApiKey = () => {
   const k=$('apiKeyInput').value.trim();
-  if(!k.startsWith('sk-')){ toast('Invalid key'); return; }
+  if(!k.startsWith('sk-')){ toast('Key should start with sk-'); return; }
   localStorage.setItem('anthropicKey',k);
-  $('apiKeyCard').style.display='none';
   toast('API key saved ✓');
+  updateInsightsModeUI();
+  $('apiKeySection').style.display='none';
+  $('apiToggleArrow').textContent='›';
 };
+window._m_clearApiKey = () => {
+  localStorage.removeItem('anthropicKey');
+  $('apiKeyInput').value='';
+  toast('API key removed');
+  updateInsightsModeUI();
+};
+function clearApiKey(){ _bridge('clearApiKey',[]); }
+function toggleApiSection(){
+  const s=$('apiKeySection');
+  const a=$('apiToggleArrow');
+  if(s.style.display==='none'){ s.style.display='block'; a.textContent='⌄'; }
+  else { s.style.display='none'; a.textContent='›'; }
+}
+function updateInsightsModeUI(){
+  const key=localStorage.getItem('anthropicKey');
+  const hasKey=key&&key.startsWith('sk-');
+  const local=$('modeLocal'), ai=$('modeAI'), lbl=$('apiStatusLabel'), btn=$('generateBtn');
+  if(local){ local.style.opacity=hasKey?'0.5':'1'; local.style.borderColor=hasKey?'var(--border)':'var(--green)'; }
+  if(ai){ ai.style.opacity=hasKey?'1':'0.5'; ai.style.borderColor=hasKey?'var(--purple)':'var(--border)'; }
+  if(lbl){ lbl.textContent=hasKey?'✓ Claude AI key saved — AI mode active':'No key saved — using free local analysis'; lbl.style.color=hasKey?'var(--green)':'var(--text3)'; }
+  if(btn){ btn.textContent=hasKey?'🤖 Generate AI Summary':'📊 Generate Free Summary'; }
+  if($('apiKeyInput')&&hasKey) $('apiKeyInput').value=key;
+}
 window._m_setPeriod = (p,btn) => {
   currentPeriod=p;
   document.querySelectorAll('.period-tab').forEach(b=>b.classList.remove('active'));
@@ -689,7 +715,161 @@ function buildStats(range){
     growth:{count:growths.length,latest:growths[growths.length-1]||null,change:growths.length>1?{wt:((growths[growths.length-1].weight||0)-(growths[0].weight||0)).toFixed(2),ht:((growths[growths.length-1].height||0)-(growths[0].height||0)).toFixed(1)}:null},
     vaccines:{due:vaccDue},milestones:{achieved:appData.milestones.filter(id=>!id.startsWith('v')).length,total:MILESTONES_PRESET.length}};
 }
+// ═══════════════════════════════════════════════════
+// DUAL-MODE INSIGHTS: Free Local + Optional Claude AI
+// ═══════════════════════════════════════════════════
+
+// ── LOCAL ANALYSIS ENGINE (free, no API needed) ──
+function localAnalysis(s) {
+  const sections = [];
+  const baby = s.baby.name || 'Your baby';
+  const days = s.period.days;
+
+  // ── FEEDING ──
+  let feedMsg = '', feedFlag = 'ok';
+  if (s.feeding.count === 0) {
+    feedMsg = 'No feedings logged in this period. Start logging feeds to get insights.';
+    feedFlag = 'warn';
+  } else {
+    const perDay = parseFloat(s.feeding.perDay);
+    const gap = s.feeding.longestGapHrs;
+    feedMsg = `${baby} had <strong>${s.feeding.count} feeds</strong> over ${days} day${days>1?'s':''} — averaging <strong>${s.feeding.perDay} feeds/day</strong>.`;
+    if (s.feeding.totalVolMl > 0) feedMsg += ` Total volume: <strong>${s.feeding.totalVolMl}ml</strong>${s.feeding.avgVol ? ` (${s.feeding.avgVol}ml avg per feed)` : ''}.`;
+    if (perDay < 6 && s.baby.ageStr && s.baby.ageStr.includes('week')) { feedMsg += ' ⚠️ Newborns typically need 8–12 feeds/day — consider checking with your pediatrician.'; feedFlag = 'warn'; }
+    else if (perDay < 4) { feedMsg += ' ⚠️ Fewer than 4 feeds/day may be low — consult your pediatrician.'; feedFlag = 'warn'; }
+    else if (perDay >= 8) { feedMsg += ' ✓ Great feeding frequency for a young baby!'; }
+    if (gap && gap > 4) { feedMsg += ` ⚠️ Longest gap between feeds was <strong>${gap} hours</strong> — for newborns, gaps over 4h should be discussed with a pediatrician.`; feedFlag = 'warn'; }
+  }
+  sections.push({ icon: '🍼', title: '🍼 Feeding Patterns', body: feedMsg, flag: feedFlag });
+
+  // ── SLEEP ──
+  let sleepMsg = '', sleepFlag = 'ok';
+  if (s.sleep.count === 0) {
+    sleepMsg = 'No sleep sessions logged yet. Use the Sleep tab to start tracking.';
+    sleepFlag = 'warn';
+  } else {
+    sleepMsg = `${baby} had <strong>${s.sleep.totalHrs}h of sleep</strong> over ${days} day${days>1?'s':''} (<strong>${s.sleep.avgPerDayHrs}h/day</strong>). That includes <strong>${s.sleep.napCount} nap${s.sleep.napCount!==1?'s':''}</strong>${s.sleep.avgNapMin ? ` averaging ${s.sleep.avgNapMin}min` : ''} and <strong>${s.sleep.nightCount} night sleep session${s.sleep.nightCount!==1?'s':''}</strong>${s.sleep.avgNightHrs ? ` averaging ${s.sleep.avgNightHrs}h` : ''}.`;
+    if (s.sleep.poorCount > 0) sleepMsg += ` <strong>${s.sleep.poorCount} session${s.sleep.poorCount>1?'s were':' was'} marked poor/restless</strong>.`;
+    const avgDay = parseFloat(s.sleep.avgPerDayHrs);
+    if (avgDay < 10) { sleepMsg += ' ⚠️ Total sleep seems low — most babies need 14–17h/day (newborns) or 12–16h (4–12 months).'; sleepFlag = 'warn'; }
+    else if (avgDay >= 12) { sleepMsg += ' ✓ Good total sleep duration!'; }
+  }
+  sections.push({ icon: '😴', title: '😴 Sleep Analysis', body: sleepMsg, flag: sleepFlag });
+
+  // ── DIAPERS ──
+  let diaperMsg = '', diaperFlag = 'ok';
+  if (s.diaper.count === 0) {
+    diaperMsg = 'No diapers logged in this period.';
+  } else {
+    const perDay = parseFloat(s.diaper.perDay);
+    diaperMsg = `<strong>${s.diaper.count} diapers</strong> logged (${s.diaper.perDay}/day) — <strong>${s.diaper.wet} wet</strong> and <strong>${s.diaper.dirty} dirty</strong>.`;
+    const wetPerDay = s.diaper.wet / days;
+    if (wetPerDay < 6 && days <= 7) { diaperMsg += ' ⚠️ Fewer than 6 wet diapers/day can indicate dehydration — consult your pediatrician if this continues.'; diaperFlag = 'warn'; }
+    else if (wetPerDay >= 6) { diaperMsg += ' ✓ Good wet diaper count — suggests adequate hydration.'; }
+    if (s.diaper.red > 0) { diaperMsg += ` 🚨 <strong>${s.diaper.red} red stool</strong> recorded — please consult your pediatrician promptly.`; diaperFlag = 'alert'; }
+    if (s.diaper.rashes > 0) { diaperMsg += ` Rash noted ${s.diaper.rashes} time${s.diaper.rashes>1?'s':''} — keep area dry and consider barrier cream.`; }
+  }
+  sections.push({ icon: '🩱', title: '🩱 Diaper Health', body: diaperMsg, flag: diaperFlag });
+
+  // ── GROWTH ──
+  let growthMsg = '';
+  if (!s.growth.latest) {
+    growthMsg = 'No measurements recorded yet. Log weight, height and head circumference in the Growth tab to track progress.';
+  } else {
+    const g = s.growth.latest;
+    growthMsg = `Latest measurement: ${[g.weight?'<strong>'+g.weight+'kg</strong>':null, g.height?'<strong>'+g.height+'cm</strong>':null, g.head?'<strong>'+g.head+'cm</strong> (head)':null].filter(Boolean).join(', ')}.`;
+    if (s.growth.change) growthMsg += ` Over this period: weight ${s.growth.change.wt>0?'+':''}${s.growth.change.wt}kg, height ${s.growth.change.ht>0?'+':''}${s.growth.change.ht}cm.`;
+    growthMsg += ` ${s.growth.count} measurement${s.growth.count>1?'s':''} recorded. Regular measurements help track growth percentiles — bring records to every pediatrician visit.`;
+    if (s.milestones.achieved > 0) growthMsg += ` <strong>${s.milestones.achieved}/${s.milestones.total} milestones</strong> achieved! 🌟`;
+  }
+  sections.push({ icon: '📈', title: '📈 Growth & Development', body: growthMsg, flag: 'ok' });
+
+  // ── MEDICINE & VACCINES ──
+  let medMsg = '';
+  if (s.medicine.count === 0 && s.vaccines.due === 0) {
+    medMsg = 'No medicines logged and all vaccines up to date for this age. ✓';
+  } else {
+    if (s.medicine.count > 0) medMsg += `<strong>${s.medicine.count} medicine dose${s.medicine.count>1?'s':''}</strong> logged (${s.medicine.list}). `;
+    if (s.vaccines.due > 0) { medMsg += `⚠️ <strong>${s.vaccines.due} vaccine${s.vaccines.due>1?'s are':' is'} due</strong> based on baby's age and WHO schedule. Check the Health tab to mark them done or schedule with your pediatrician.`; }
+  }
+  sections.push({ icon: '💊', title: '💊 Medicine & Vaccines', body: medMsg || 'Nothing to flag.', flag: s.vaccines.due > 0 ? 'warn' : 'ok' });
+
+  // ── WHAT'S GOING WELL ──
+  const positives = [];
+  if (parseFloat(s.feeding.perDay) >= 6) positives.push('Great feeding frequency — baby is feeding regularly');
+  if (parseFloat(s.sleep.avgPerDayHrs) >= 12) positives.push('Healthy total sleep duration');
+  if (s.diaper.wet/Math.max(days,1) >= 6) positives.push('Good hydration — plenty of wet diapers');
+  if (s.diaper.red === 0) positives.push('No concerning stool colors logged');
+  if (s.milestones.achieved > 0) positives.push(`${s.milestones.achieved} milestone${s.milestones.achieved>1?'s':''} achieved 🌟`);
+  if (s.feeding.count > 0 && s.sleep.count > 0 && s.diaper.count > 0) positives.push('Both parents are actively logging — great teamwork! 👫');
+  sections.push({ icon: '✅', title: '✅ What\'s Going Well', body: positives.length > 0 ? positives.map(p=>`• ${p}`).join('<br>') : 'Keep logging data — insights improve as more data is collected.', flag: 'ok' });
+
+  // ── WATCH POINTS ──
+  const watches = [];
+  if (s.diaper.red > 0) watches.push('🚨 Red stool logged — consult pediatrician promptly');
+  if (parseFloat(s.sleep.avgPerDayHrs) < 10 && s.sleep.count > 0) watches.push('Total sleep may be below recommended — track patterns over the next few days');
+  if (s.sleep.poorCount > s.sleep.count * 0.5 && s.sleep.count > 2) watches.push('More than half of sleep sessions were poor/restless — consider sleep environment or routine');
+  if (s.vaccines.due > 0) watches.push(`${s.vaccines.due} vaccine${s.vaccines.due>1?'s':''} due — schedule with pediatrician`);
+  if (s.feeding.longestGapHrs > 5) watches.push(`Longest feed gap was ${s.feeding.longestGapHrs}h — monitor closely for newborns`);
+  if (s.diaper.rashes > 0) watches.push('Diaper rash noted — keep area clean and dry, use barrier cream');
+  sections.push({ icon: '⚠️', title: '⚠️ Watch Points', body: watches.length > 0 ? watches.map(w=>`• ${w}`).join('<br>') : '• Nothing urgent to flag — keep logging for better insights!', flag: watches.length > 0 ? 'warn' : 'ok' });
+
+  // ── TIPS ──
+  const tips = [];
+  if (days === 1) tips.push('Log at least a week of data to see meaningful patterns and trends');
+  if (s.growth.count === 0) tips.push('Add a weight measurement in the Growth tab — even once a week helps track progress');
+  if (s.sleep.count < 3) tips.push('Use the Sleep timer for a few days to get accurate nap and night sleep data');
+  if (s.feeding.count > 0 && !s.feeding.avgVol) tips.push('Try logging volume (ml) on bottle feeds — it helps track total intake per day');
+  if (tips.length < 2) tips.push('Add both parents to the app via the invite code in Settings so all caregivers can log');
+  if (tips.length < 3) tips.push('Generate an AI summary to get deeper, personalised insights — requires a small Anthropic API credit (~$0.01)');
+  sections.push({ icon: '💡', title: '💡 Tips for This Period', body: tips.map(t=>`• ${t}`).join('<br>'), flag: 'ok' });
+
+  return sections;
+}
+
+function renderLocalSummary(sections, s, label) {
+  const clrs = {'🍼':'var(--pink-bg)','😴':'var(--purple-bg)','🩱':'var(--blue-bg)','📈':'var(--green-bg)','💊':'var(--amber-bg)','✅':'var(--green-bg)','⚠️':'var(--red-bg)','💡':'var(--accent-bg)'};
+  const borders = {'⚠️':'var(--red)', '✅':'var(--green)', 'alert':'var(--red)'};
+  const flagBorders = {'warn':'var(--amber)', 'alert':'var(--red)', 'ok':'var(--border)'};
+  $('summaryCard').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div>
+        <div style="font-family:'DM Serif Display',serif;font-size:18px;">${s.baby.name}'s Report</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">${label} · ${s.baby.ageStr}</div>
+      </div>
+      <div style="background:var(--green-bg);border:1px solid var(--green);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--green);">📊 Local Analysis</div>
+    </div>
+    ${sections.map(sec => {
+      const ic = sec.icon;
+      const bg = clrs[ic] || 'var(--bg2)';
+      const bc = flagBorders[sec.flag] || 'var(--border)';
+      return `<div style="background:${bg};border:1px solid ${bc};border-radius:12px;padding:12px;margin-bottom:8px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:5px;">${sec.title}</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;">${sec.body}</div>
+      </div>`;
+    }).join('')}
+    <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+      📊 Local analysis · Not medical advice · <strong>Add API key above for deeper Claude AI insights</strong>
+    </div>`;
+  lastSummaryText = sections.map(s => `## ${s.title}\n${s.body.replace(/<[^>]+>/g,'')}`).join('\n\n');
+}
+
 window._m_generateInsights = async () => {
+  const range = getPeriodRange(); if(!range) return;
+  const s = buildStats(range);
+  const total = s.feeding.count + s.sleep.count + s.diaper.count + s.medicine.count;
+  if(total === 0){ toast('No data logged in this period yet'); return; }
+
+  $('summaryOutput').style.display = 'block';
+  $('rawStats').style.display = 'block';
+  renderRawStats(s);
+
+  const key = localStorage.getItem('anthropicKey');
+  const useAI = key && key.startsWith('sk-');
+
+  if (useAI) {
+    // ── AI MODE ──
+    $('summaryCard').innerHTML = `<div class="ai-generating"><div class="ai-spinner"></div><div class="ai-gen-label">Claude is analysing ${total} entries…</div></div>`;
   const key=localStorage.getItem('anthropicKey');
   if(!key){toast('Add API key first');$('apiKeyCard').style.display='block';return;}
   const range=getPeriodRange(); if(!range)return;
@@ -699,7 +879,7 @@ window._m_generateInsights = async () => {
   $('summaryOutput').style.display='block';$('rawStats').style.display='block';
   $('summaryCard').innerHTML=`<div class="ai-generating"><div class="ai-spinner"></div><div class="ai-gen-label">Analyzing ${total} entries…</div></div>`;
   renderRawStats(s);
-  const prompt=`You are a warm pediatric health assistant for parents. Analyze this baby data and provide insights.
+    const prompt=`You are a warm pediatric health assistant for parents. Analyse this baby data and provide insights.
 
 Baby: ${s.baby.name}, ${s.baby.ageStr} | Period: ${s.period.label} (${s.period.days} days)
 
@@ -720,15 +900,32 @@ Use EXACTLY these section headers:
 ## ⚠️ Watch Points
 ## 💡 Tips for This Week
 
-Be warm, specific, data-driven. 2-4 sentences per section. Flag urgent concerns clearly (red stool post-newborn, <6 wet/day, >4hr feed gap in newborns, very low sleep). Always suggest pediatrician for concerns. Do NOT give medical diagnoses.`;
-
-  try {
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})});
-    if(!res.ok){const err=await res.json();throw new Error(err.error?.message||'API error');}
-    const data=await res.json();
-    lastSummaryText=data.content[0].text;
-    renderSummary(lastSummaryText,s,range.label);
-  } catch(e){ $('summaryCard').innerHTML=`<div style="padding:16px;color:var(--red);font-size:13px;">⚠️ ${e.message}</div>`; }
+Be warm, specific, data-driven. 2-4 sentences per section. Flag urgent concerns (red stool post-newborn, <6 wet/day, >4hr feed gap in newborns, very low sleep). Suggest pediatrician for concerns. Do NOT diagnose.`;
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1500,messages:[{role:'user',content:prompt}]})});
+      if(!res.ok){
+        const err=await res.json();
+        // If credits exhausted, fall back to local
+        if(err.error?.type==='insufficient_quota'||res.status===402||res.status===429){
+          toast('API credits low — showing local analysis');
+          renderLocalSummary(localAnalysis(s), s, range.label);
+        } else {
+          throw new Error(err.error?.message||'API error');
+        }
+      } else {
+        const data = await res.json();
+        lastSummaryText = data.content[0].text;
+        renderSummary(lastSummaryText, s, range.label);
+      }
+    } catch(e) {
+      // Any error — fall back to local analysis gracefully
+      toast('AI unavailable — showing local analysis');
+      renderLocalSummary(localAnalysis(s), s, range.label);
+    }
+  } else {
+    // ── LOCAL MODE (no API key) ──
+    renderLocalSummary(localAnalysis(s), s, range.label);
+  }
 };
 function renderSummary(text,s,label){
   const sections=text.split(/^## /m).filter(x=>x.trim());
@@ -1233,22 +1430,57 @@ canvas{width:100%;border-radius:8px;display:block;}
 
     <!-- AI INSIGHTS -->
     <div class="page" id="page-insights">
+      <!-- Hero -->
       <div class="ai-hero">
         <div style="font-size:36px;margin-bottom:8px;">🧠</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--purple);margin-bottom:4px;">AI Baby Insights</div>
-        <div style="font-size:13px;color:var(--text2);">Powered by Claude · Learns from your shared family data</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--purple);margin-bottom:4px;">Baby Insights</div>
+        <div style="font-size:13px;color:var(--text2);">Free local analysis · Optional Claude AI for deeper insights</div>
       </div>
-      <div class="apikey-card" id="apiKeyCard">
-        <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:6px;">🔑 Anthropic API Key</div>
-        <div style="display:flex;gap:8px;"><input type="password" id="apiKeyInput" placeholder="sk-ant-api03-…" style="font-family:'DM Mono',monospace;font-size:12px;flex:1;"><button class="btn btn-purple btn-sm" onclick="saveApiKey()">Save</button></div>
-        <div style="font-size:11px;color:var(--text3);margin-top:6px;">Stored in your browser only. Get a free key at console.anthropic.com</div>
+
+      <!-- Mode indicator -->
+      <div id="modeIndicator" style="display:flex;gap:8px;margin-bottom:12px;">
+        <div id="modeLocal" style="flex:1;background:var(--green-bg);border:1px solid var(--green);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:16px;margin-bottom:2px;">📊</div>
+          <div style="font-size:12px;font-weight:600;color:var(--green);">Free Analysis</div>
+          <div style="font-size:10px;color:var(--text3);">Always available</div>
+        </div>
+        <div id="modeAI" style="flex:1;background:var(--purple-bg);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;opacity:0.5;">
+          <div style="font-size:16px;margin-bottom:2px;">🤖</div>
+          <div style="font-size:12px;font-weight:600;color:var(--purple);">Claude AI</div>
+          <div style="font-size:10px;color:var(--text3);">Add API key below</div>
+        </div>
       </div>
+
+      <!-- API key — optional, collapsed by default -->
+      <div class="card" style="margin-bottom:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleApiSection()">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);">🔑 Optional: Add API key for Claude AI</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px;" id="apiStatusLabel">No key saved — using free local analysis</div>
+          </div>
+          <div id="apiToggleArrow" style="color:var(--text3);font-size:16px;">›</div>
+        </div>
+        <div id="apiKeySection" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:8px;">Each AI summary costs ~$0.003 using Claude Haiku. Get a key at <strong>console.anthropic.com</strong> → API Keys → Create Key.</div>
+          <div style="display:flex;gap:8px;">
+            <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-…" style="font-family:'DM Mono',monospace;font-size:12px;flex:1;">
+            <button class="btn btn-purple btn-sm" onclick="saveApiKey()">Save</button>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="clearApiKey()" style="font-size:11px;">Remove key</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Period selector -->
       <div class="period-tabs"><button class="period-tab active" onclick="setPeriod('day',this)">Today</button><button class="period-tab" onclick="setPeriod('week',this)">Week</button><button class="period-tab" onclick="setPeriod('month',this)">Month</button><button class="period-tab" onclick="setPeriod('custom',this)">Custom</button></div>
       <div class="custom-range" id="customRange"><div class="row2"><div class="field"><label class="lbl">From</label><input type="date" id="customFrom"></div><div class="field"><label class="lbl">To</label><input type="date" id="customTo"></div></div></div>
-      <button class="btn btn-purple btn-full" onclick="generateInsights()" style="margin-bottom:12px;">✨ Generate AI Summary</button>
+
+      <button class="btn btn-purple btn-full" onclick="generateInsights()" style="margin-bottom:12px;" id="generateBtn">📊 Generate Summary</button>
+
       <div id="summaryOutput" style="display:none;">
         <div class="ai-summary-card" id="summaryCard"></div>
-        <div class="pdf-btn-row"><button class="btn btn-accent btn-sm" onclick="exportPDF()">📄 Export PDF</button><button class="btn btn-ghost btn-sm" onclick="copyInsights()">📋 Copy</button></div>
+        <div class="pdf-btn-row"><button class="btn btn-accent btn-sm" onclick="exportPDF()">📄 Export PDF</button><button class="btn btn-ghost btn-sm" onclick="copyInsights()">📋 Copy text</button></div>
       </div>
       <div id="rawStats" style="display:none;"><div class="card" id="rawStatsCard"><div class="card-title">Period statistics</div><div id="rawStatsContent"></div></div></div>
     </div>
