@@ -7,46 +7,62 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<!-- Bridge stubs — ensure onclick handlers never throw "not defined"
-     while the ES module is still loading. The module overwrites these. -->
+<!-- Bridge: safely defer onclick calls until Firebase module is ready -->
 <script>
-function _waitAndCall(fn, args) {
-  // Poll until the real function is available (module loaded)
-  if (typeof window[fn] === 'function') { window[fn](...args); return; }
-  setTimeout(() => _waitAndCall(fn, args), 80);
+// Queue of calls made before module loaded
+window._callQueue = [];
+window._moduleReady = false;
+
+// Called by onclick handlers — queues the call if module not ready yet
+function _bridge(fn, args) {
+  if (window._moduleReady && typeof window['_m_'+fn] === 'function') {
+    window['_m_'+fn](...args);
+  } else {
+    window._callQueue.push({fn, args});
+  }
 }
-function doLogin()   { _waitAndCall('doLogin',   []); }
-function doSignup()  { _waitAndCall('doSignup',  []); }
-function doGoogle()  { _waitAndCall('doGoogle',  []); }
-function doSignOut() { _waitAndCall('doSignOut', []); }
-function createFamily()   { _waitAndCall('createFamily',   []); }
-function joinFamily()     { _waitAndCall('joinFamily',     []); }
-function saveBabySettings(){ _waitAndCall('saveBabySettings', []); }
-function logFeeding()  { _waitAndCall('logFeeding',  []); }
-function logSleep()    { _waitAndCall('logSleep',    []); }
-function logDiaper()   { _waitAndCall('logDiaper',   []); }
-function logMed()      { _waitAndCall('logMed',      []); }
-function logGrowth()   { _waitAndCall('logGrowth',   []); }
-function startSleepTimer() { _waitAndCall('startSleepTimer', []); }
-function stopSleep()   { _waitAndCall('stopSleep',   []); }
-function cancelSleep() { _waitAndCall('cancelSleep', []); }
-function saveApiKey()  { _waitAndCall('saveApiKey',  []); }
-function generateInsights() { _waitAndCall('generateInsights', []); }
-function exportPDF()   { _waitAndCall('exportPDF',   []); }
-function copyInsights(){ _waitAndCall('copyInsights', []); }
-function toggleTheme() { _waitAndCall('toggleTheme', []); }
-function renderMilestones() { _waitAndCall('renderMilestones', []); }
-function renderVaccines()   { _waitAndCall('renderVaccines',   []); }
-// Parameterised stubs
-function del(col, id)         { _waitAndCall('del', [col, id]); }
-function setTg(g, v, b)       { _waitAndCall('setTg', [g, v, b]); }
-function showStool(s)         { _waitAndCall('showStool', [s]); }
-function drawChart()          { _waitAndCall('drawChart', []); }
-function toggleMs(id)         { _waitAndCall('toggleMs', [id]); }
-function toggleVacc(id)       { _waitAndCall('toggleVacc', [id]); }
-function toggleMilestone(id)  { _waitAndCall('toggleMilestone', [id]); }
-function setPeriod(p, btn)    { _waitAndCall('setPeriod', [p, btn]); }
-function showPage(name, btn)  { _waitAndCall('showPage', [name, btn]); }
+
+// Flush queue once module signals ready
+window._flushQueue = function() {
+  window._moduleReady = true;
+  window._callQueue.forEach(({fn, args}) => {
+    if (typeof window['_m_'+fn] === 'function') window['_m_'+fn](...args);
+  });
+  window._callQueue = [];
+};
+
+// All onclick stubs — each delegates to _bridge
+function doLogin()              { _bridge('doLogin', []); }
+function doSignup()             { _bridge('doSignup', []); }
+function doGoogle()             { _bridge('doGoogle', []); }
+function doSignOut()            { _bridge('doSignOut', []); }
+function createFamily()         { _bridge('createFamily', []); }
+function joinFamily()           { _bridge('joinFamily', []); }
+function saveBabySettings()     { _bridge('saveBabySettings', []); }
+function logFeeding()           { _bridge('logFeeding', []); }
+function logSleep()             { _bridge('logSleep', []); }
+function logDiaper()            { _bridge('logDiaper', []); }
+function logMed()               { _bridge('logMed', []); }
+function logGrowth()            { _bridge('logGrowth', []); }
+function startSleepTimer()      { _bridge('startSleepTimer', []); }
+function stopSleep()            { _bridge('stopSleep', []); }
+function cancelSleep()          { _bridge('cancelSleep', []); }
+function saveApiKey()           { _bridge('saveApiKey', []); }
+function generateInsights()     { _bridge('generateInsights', []); }
+function exportPDF()            { _bridge('exportPDF', []); }
+function copyInsights()         { _bridge('copyInsights', []); }
+function toggleTheme()          { _bridge('toggleTheme', []); }
+function renderMilestones()     { _bridge('renderMilestones', []); }
+function renderVaccines()       { _bridge('renderVaccines', []); }
+function del(col, id)           { _bridge('del', [col, id]); }
+function setTg(g, v, b)        { _bridge('setTg', [g, v, b]); }
+function showStool(s)           { _bridge('showStool', [s]); }
+function drawChart()            { _bridge('drawChart', []); }
+function toggleMs(id)           { _bridge('toggleMs', [id]); }
+function toggleVacc(id)         { _bridge('toggleVacc', [id]); }
+function toggleMilestone(id)    { _bridge('toggleMilestone', [id]); }
+function setPeriod(p, btn)      { _bridge('setPeriod', [p, btn]); }
+function showPage(name, btn)    { _bridge('showPage', [name, btn]); }
 </script>
 
 <!-- Firebase SDKs -->
@@ -129,43 +145,64 @@ function toggleTheme(){
 }
 
 // ─── AUTH SCREENS ───
-window.showLogin = () => showScreen('screen-login');
-window.showSignup = () => showScreen('screen-signup');
-window.showForgot = () => { toast('Password reset: use Firebase Console or add resetPassword() flow'); };
+window._m_showLogin = () => showScreen('screen-login');
+window._m_showSignup = () => showScreen('screen-signup');
+window._m_showForgot = () => { toast('Password reset: use Firebase Console or add resetPassword() flow'); };
 
-window.doLogin = async () => {
+window._m_doLogin = async () => {
   const email=$('loginEmail').value.trim(), pass=$('loginPass').value;
   if(!email||!pass){toast('Enter email and password');return;}
   $('loginBtn').textContent='Signing in…';
+  const errEl=$('loginErrorMsg'); if(errEl)errEl.remove();
   try {
     await signInWithEmailAndPassword(auth, email, pass);
   } catch(e) {
-    toast(friendlyError(e)); $('loginBtn').textContent='Sign in';
+    $('loginBtn').textContent='Sign in';
+    if(e.code==='auth/user-not-found'||e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'){
+      const msg=document.createElement('div');
+      msg.id='loginErrorMsg';
+      msg.style.cssText='background:var(--red-bg);border:1px solid var(--red);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text2);margin-top:10px;text-align:center;';
+      msg.innerHTML=`No account found with that email. <br><a onclick="window._m_showSignup();setTimeout(()=>{const s=document.getElementById('signupEmail');if(s)s.value='${email}'||document.getElementById('loginEmail').value;},50);" style="color:var(--accent);font-weight:600;cursor:pointer;">Create an account →</a>`;
+      $('loginBtn').parentNode.appendChild(msg);
+    } else { toast(friendlyError(e)); }
   }
 };
-window.doSignup = async () => {
+window._m_doSignup = async () => {
   const name=$('signupName').value.trim(), email=$('signupEmail').value.trim(), pass=$('signupPass').value, pass2=$('signupPass2').value;
-  if(!name||!email||!pass){toast('Fill all fields');return;}
+  if(!name){toast('Enter your name');return;}
+  if(!email){toast('Enter your email');return;}
+  if(!pass){toast('Enter a password');return;}
   if(pass!==pass2){toast('Passwords do not match');return;}
   if(pass.length<6){toast('Password must be at least 6 characters');return;}
   $('signupBtn').textContent='Creating account…';
+  $('signupBtn').disabled=true;
+  const errEl=$('signupErrorMsg'); if(errEl)errEl.remove();
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, {displayName: name});
     currentUser = cred.user;
-    await checkOrCreateFamily(cred.user);
+    showScreen('screen-family-setup');
+    $('setupUserName').textContent = name;
   } catch(e) {
-    toast(friendlyError(e)); $('signupBtn').textContent='Create account';
+    $('signupBtn').textContent='Create account';
+    $('signupBtn').disabled=false;
+    if(e.code==='auth/email-already-in-use'){
+      const msg=document.createElement('div');
+      msg.id='signupErrorMsg';
+      msg.style.cssText='background:var(--red-bg);border:1px solid var(--red);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text2);margin-top:10px;text-align:center;';
+      msg.innerHTML=`Account already exists. <a onclick="window._m_showLogin();setTimeout(()=>{const l=document.getElementById('loginEmail');if(l)l.value=document.getElementById('signupEmail').value;},50);" style="color:var(--accent);font-weight:600;cursor:pointer;">Sign in instead →</a>`;
+      $('signupBtn').parentNode.appendChild(msg);
+    } else { toast(friendlyError(e)); }
   }
 };
-window.doGoogle = async () => {
+window._m_doGoogle = async () => {
   try {
     const cred = await signInWithPopup(auth, googleProvider);
     currentUser = cred.user;
     await checkOrCreateFamily(cred.user);
   } catch(e) { toast(friendlyError(e)); }
 };
-window.doSignOut = async () => {
+window._m_doSignOut = async () => {
   unsubscribers.forEach(u=>u());
   unsubscribers=[];
   await signOut(auth);
@@ -195,7 +232,7 @@ async function checkOrCreateFamily(user) {
   }
 }
 
-window.createFamily = async () => {
+window._m_createFamily = async () => {
   const babyName = $('setupBabyName').value.trim();
   const babyDob = $('setupBabyDob').value;
   const babyGender = $('setupBabyGender').value;
@@ -221,7 +258,7 @@ window.createFamily = async () => {
   } catch(e){ toast('Error: '+e.message); $('createFamilyBtn').textContent='Create Family Profile'; }
 };
 
-window.joinFamily = async () => {
+window._m_joinFamily = async () => {
   const code = $('joinCode').value.trim().toUpperCase();
   if(!code){ toast('Enter an invite code'); return; }
   $('joinFamilyBtn').textContent = 'Joining…';
@@ -314,7 +351,7 @@ function updateBabyHeader(){
   $('babyAgeD').textContent=babyAgeStr();
 }
 
-window.saveBabySettings = async () => {
+window._m_saveBabySettings = async () => {
   const name=$('settingsBabyName').value.trim();
   const dob=$('settingsBabyDob').value;
   const gender=$('settingsBabyGender').value;
@@ -343,7 +380,7 @@ async function toggleMilestone(id){
 }
 
 // ─── FEEDING ───
-window.logFeeding = async () => {
+window._m_logFeeding = async () => {
   const d=$('fDate').value, t=$('fTime').value;
   if(!d||!t){ toast('Set date & time'); return; }
   const ok = await addEntry('feedings',{feedType:tgVal('feedTypeGrp')||'Left Breast', date:d, time:t, ts:new Date(d+'T'+t).getTime(), vol:$('fVol').value||'', dur:$('fDur').value||'', notes:$('fNotes').value});
@@ -351,7 +388,7 @@ window.logFeeding = async () => {
 };
 
 // ─── SLEEP ───
-window.startSleepTimer = () => {
+window._m_startSleepTimer = () => {
   if(activeSleep){ toast('Sleep already running'); return; }
   activeSleep={start:Date.now(), type:tgVal('slpTypeGrp')||'Nap', quality:tgVal('slpQualGrp')||'Good'};
   localStorage.setItem('activeSleep',JSON.stringify(activeSleep));
@@ -363,14 +400,14 @@ window.startSleepTimer = () => {
   },1000);
   toast('Sleep timer started');
 };
-window.stopSleep = async () => {
+window._m_stopSleep = async () => {
   if(!activeSleep) return;
   const endTs=Date.now();
   const ok = await addEntry('sleeps',{sleepType:activeSleep.type, quality:activeSleep.quality, startTs:activeSleep.start, endTs, duration:endTs-activeSleep.start, ts:activeSleep.start});
   if(ok){ activeSleep=null; clearInterval(slpInterval); localStorage.removeItem('activeSleep'); $('activeSlpCard').style.display='none'; $('slpFormCard').style.opacity='1'; toast('Sleep logged ✓'); }
 };
-window.cancelSleep = () => { activeSleep=null; clearInterval(slpInterval); localStorage.removeItem('activeSleep'); $('activeSlpCard').style.display='none'; $('slpFormCard').style.opacity='1'; };
-window.logSleep = async () => {
+window._m_cancelSleep = () => { activeSleep=null; clearInterval(slpInterval); localStorage.removeItem('activeSleep'); $('activeSlpCard').style.display='none'; $('slpFormCard').style.opacity='1'; };
+window._m_logSleep = async () => {
   const sv=$('slpStart').value, ev=$('slpEnd').value;
   if(!sv||!ev){ toast('Set start & end time'); return; }
   const st=new Date(sv).getTime(), et=new Date(ev).getTime();
@@ -380,8 +417,8 @@ window.logSleep = async () => {
 };
 
 // ─── DIAPER ───
-window.showStool = show => $('stoolOpts').style.display=show?'block':'none';
-window.logDiaper = async () => {
+window._m_showStool = show => $('stoolOpts').style.display=show?'block':'none';
+window._m_logDiaper = async () => {
   const d=$('dpDate').value, t=$('dpTime').value;
   if(!d||!t){ toast('Set date & time'); return; }
   const dt=tgVal('dpTypeGrp')||'Wet';
@@ -390,7 +427,7 @@ window.logDiaper = async () => {
 };
 
 // ─── MEDICINE ───
-window.logMed = async () => {
+window._m_logMed = async () => {
   const dt=$('medDT').value;
   if(!dt||!$('medName').value){ toast('Enter medicine name & time'); return; }
   const ok = await addEntry('meds',{name:$('medName').value, dose:$('medDose').value, ts:new Date(dt).getTime(), nextHrs:parseFloat($('medNext').value)||0, notes:$('medNotes').value});
@@ -398,7 +435,7 @@ window.logMed = async () => {
 };
 
 // ─── GROWTH ───
-window.logGrowth = async () => {
+window._m_logGrowth = async () => {
   const d=$('grDate').value;
   if(!d){ toast('Set date'); return; }
   const w=$('grWt').value, h=$('grHt').value, hd=$('grHd').value;
@@ -408,7 +445,7 @@ window.logGrowth = async () => {
 };
 
 // ─── DELETE ───
-window.del = (col,id) => delEntry(col,id);
+window._m_del = (col,id) => delEntry(col,id);
 
 // ─── VACCINES ───
 const WHO_VACCINES=[
@@ -450,8 +487,8 @@ function renderVaccines(){
     return`<div class="vacc-item"><div class="vacc-dot" style="background:${dc}"></div><div style="flex:1;"><div class="vacc-name">${v.name}</div><div class="vacc-age">${v.age} · ${v.disease}</div></div><span class="vacc-status ${sc}">${st}</span><span style="cursor:pointer;font-size:18px;" onclick="toggleMilestone('${v.id}')">${done?'☑':'☐'}</span></div>`;
   }).join('');
 }
-window.toggleVacc = id => toggleMilestone(id);
-window.toggleMs = id => toggleMilestone(id);
+window._m_toggleVacc = id => toggleMilestone(id);
+window._m_toggleMs = id => toggleMilestone(id);
 
 function renderMilestones(){
   const f=tgVal('msFilterGrp')||'all';
@@ -463,7 +500,7 @@ function renderMilestones(){
 }
 
 // ─── GROWTH CHART ───
-window.drawChart = () => {
+window._m_drawChart = () => {
   const canvas=$('growthCanvas'); if(!canvas)return;
   const metric=tgVal('grMetricGrp')||'weight';
   const ctx=canvas.getContext('2d');
@@ -569,14 +606,14 @@ function renderAll(){
 }
 
 // ─── AI INSIGHTS ───
-window.saveApiKey = () => {
+window._m_saveApiKey = () => {
   const k=$('apiKeyInput').value.trim();
   if(!k.startsWith('sk-')){ toast('Invalid key'); return; }
   localStorage.setItem('anthropicKey',k);
   $('apiKeyCard').style.display='none';
   toast('API key saved ✓');
 };
-window.setPeriod = (p,btn) => {
+window._m_setPeriod = (p,btn) => {
   currentPeriod=p;
   document.querySelectorAll('.period-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
@@ -614,7 +651,7 @@ function buildStats(range){
     growth:{count:growths.length,latest:growths[growths.length-1]||null,change:growths.length>1?{wt:((growths[growths.length-1].weight||0)-(growths[0].weight||0)).toFixed(2),ht:((growths[growths.length-1].height||0)-(growths[0].height||0)).toFixed(1)}:null},
     vaccines:{due:vaccDue},milestones:{achieved:appData.milestones.filter(id=>!id.startsWith('v')).length,total:MILESTONES_PRESET.length}};
 }
-window.generateInsights = async () => {
+window._m_generateInsights = async () => {
   const key=localStorage.getItem('anthropicKey');
   if(!key){toast('Add API key first');$('apiKeyCard').style.display='block';return;}
   const range=getPeriodRange(); if(!range)return;
@@ -664,7 +701,7 @@ function renderSummary(text,s,label){
 function renderRawStats(s){
   $('rawStatsContent').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div style="background:var(--pink-bg);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--pink)">${s.feeding.count}</div><div style="font-size:10px;color:var(--text3);">Feeds (${s.feeding.perDay}/day)</div></div><div style="background:var(--purple-bg);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--purple)">${s.sleep.totalHrs}h</div><div style="font-size:10px;color:var(--text3);">Total sleep</div></div><div style="background:var(--blue-bg);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--blue)">${s.diaper.count}</div><div style="font-size:10px;color:var(--text3);">Diapers (${s.diaper.wet}W/${s.diaper.dirty}D)</div></div><div style="background:var(--amber-bg);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--amber)">${s.medicine.count}</div><div style="font-size:10px;color:var(--text3);">Meds</div></div></div>${s.growth.latest?`<div style="margin-top:8px;background:var(--green-bg);border-radius:10px;padding:10px;text-align:center;font-size:12px;color:var(--text2);">Latest: ${[s.growth.latest.weight?s.growth.latest.weight+'kg':null,s.growth.latest.height?s.growth.latest.height+'cm':null,s.growth.latest.head?s.growth.latest.head+'cm HC':null].filter(Boolean).join(' · ')}</div>`:''}`;
 }
-window.exportPDF = async () => {
+window._m_exportPDF = async () => {
   if(!lastSummaryText){toast('Generate summary first');return;}
   toast('Building PDF…');
   const{jsPDF}=window.jspdf;
@@ -706,7 +743,7 @@ window.exportPDF = async () => {
   doc.save(`tinylog-${(appData.baby.name||'baby').toLowerCase()}-${todayStr()}.pdf`);
   toast('PDF saved ✓');
 };
-window.copyInsights = () => { if(!lastSummaryText){toast('Generate first');return;} navigator.clipboard.writeText(lastSummaryText).then(()=>toast('Copied ✓')); };
+window._m_copyInsights = () => { if(!lastSummaryText){toast('Generate first');return;} navigator.clipboard.writeText(lastSummaryText).then(()=>toast('Copied ✓')); };
 
 // ─── INIT TOGGLE DEFAULTS ───
 function initToggleDefaults(){
@@ -734,18 +771,18 @@ onAuthStateChanged(auth, async user => {
 });
 
 // Expose needed globals
-window.showPage=showPage;
-window.showScreen=showScreen;
-window.setTg=setTg;
-window.tgVal=tgVal;
-window.toggleTheme=toggleTheme;
-window.drawChart=drawChart;
-window.renderMilestones=renderMilestones;
-window.renderVaccines=renderVaccines;
-window.toggleMilestone=toggleMilestone;
-window.toast=toast;
+window._m_showPage=showPage;
+window._m_showScreen=showScreen;
+window._m_setTg=setTg;
+window._m_tgVal=tgVal;
+window._m_toggleTheme=toggleTheme;
+window._m_drawChart=drawChart;
+window._m_renderMilestones=renderMilestones;
+window._m_renderVaccines=renderVaccines;
+window._m_toggleMilestone=toggleMilestone;
+window._m_toast=toast;
 // Signal that module has fully loaded
-window._moduleReady=true;
+if(window._flushQueue) window._flushQueue(); else window._moduleReady=true;
 
 </script>
 
@@ -1222,12 +1259,12 @@ function switchSetupTab(tab, btn){
 function showLogin(){ document.getElementById('auth-login').style.display='block'; document.getElementById('auth-signup').style.display='none'; }
 function showSignup(){ document.getElementById('auth-login').style.display='none'; document.getElementById('auth-signup').style.display='block'; }
 // Also expose on window so module can call them
-window.showLogin = showLogin;
-window.showSignup = showSignup;
+window._m_showLogin = showLogin;
+window._m_showSignup = showSignup;
 
 // Populate settings when navigating to it
 const _origShowPage = window.showPage;
-window.showPage = function(name, btn){
+window._m_showPage = function(name, btn){
   _origShowPage(name, btn);
   if(name==='settings'){
     const u = window._currentUser;
