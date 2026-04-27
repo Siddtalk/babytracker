@@ -9,26 +9,34 @@
 
 <!-- Bridge: safely defer onclick calls until Firebase module is ready -->
 <script>
-// Queue of calls made before module loaded
-window._callQueue = [];
+// Robust bridge: retries until module function is available
 window._moduleReady = false;
 
-// Called by onclick handlers — queues the call if module not ready yet
 function _bridge(fn, args) {
-  if (window._moduleReady && typeof window['_m_'+fn] === 'function') {
-    window['_m_'+fn](...args);
-  } else {
-    window._callQueue.push({fn, args});
+  // If module already loaded, call directly
+  if (typeof window['_m_'+fn] === 'function') {
+    window['_m_'+fn](...args); return;
   }
+  // Show user the app is still loading
+  const toast = document.getElementById('toast');
+  if (toast) { toast.textContent = 'Loading…'; toast.classList.add('show'); }
+  // Retry up to 50 times (5 seconds total)
+  let attempts = 0;
+  const retry = setInterval(() => {
+    attempts++;
+    if (typeof window['_m_'+fn] === 'function') {
+      clearInterval(retry);
+      if (toast) toast.classList.remove('show');
+      window['_m_'+fn](...args);
+    } else if (attempts > 50) {
+      clearInterval(retry);
+      if (toast) { toast.textContent = 'Load failed — refresh page'; }
+    }
+  }, 100);
 }
 
-// Flush queue once module signals ready
 window._flushQueue = function() {
   window._moduleReady = true;
-  window._callQueue.forEach(({fn, args}) => {
-    if (typeof window['_m_'+fn] === 'function') window['_m_'+fn](...args);
-  });
-  window._callQueue = [];
 };
 
 // All onclick stubs — each delegates to _bridge
@@ -65,11 +73,42 @@ function setPeriod(p, btn)      { _bridge('setPeriod', [p, btn]); }
 function showPage(name, btn)    { _bridge('showPage', [name, btn]); }
 </script>
 
-<!-- Firebase SDKs -->
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, onSnapshot, query, orderBy, serverTimestamp, arrayUnion, arrayRemove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+<!-- Firebase Compat SDKs (no ES modules — works on all browsers) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+// ── Shim: map ES module API names → Firebase compat API ──
+function initializeApp(cfg){ return firebase.initializeApp(cfg); }
+function getAuth(app){ return firebase.auth(app); }
+function getFirestore(app){ return firebase.firestore(app); }
+function GoogleAuthProvider(){ return new firebase.auth.GoogleAuthProvider(); }
+GoogleAuthProvider.prototype = firebase.auth.GoogleAuthProvider.prototype;
+function onAuthStateChanged(auth,cb){ return auth.onAuthStateChanged(cb); }
+function signInWithEmailAndPassword(auth,e,p){ return auth.signInWithEmailAndPassword(e,p); }
+function createUserWithEmailAndPassword(auth,e,p){ return auth.createUserWithEmailAndPassword(e,p); }
+function signInWithPopup(auth,prov){ return auth.signInWithPopup(prov); }
+function signOut(auth){ return auth.signOut(); }
+function updateProfile(user,data){ return user.updateProfile(data); }
+function serverTimestamp(){ return firebase.firestore.FieldValue.serverTimestamp(); }
+function arrayUnion(...a){ return firebase.firestore.FieldValue.arrayUnion(...a); }
+function arrayRemove(...a){ return firebase.firestore.FieldValue.arrayRemove(...a); }
+// Firestore path helpers
+function _resolve(db, segs){
+  let ref = db;
+  segs.forEach((s,i) => { ref = (i%2===0) ? ref.collection(s) : ref.doc(s); });
+  return ref;
+}
+function doc(db,...path){ const segs=path.join('/').split('/'); return _resolve(db,segs); }
+function collection(db,...path){ const segs=path.join('/').split('/'); return _resolve(db,segs); }
+async function getDoc(ref){ const s=await ref.get(); return {exists:()=>s.exists,data:()=>s.data(),id:s.id}; }
+function setDoc(ref,data){ return ref.set(data); }
+function updateDoc(ref,data){ return ref.update(data); }
+function addDoc(col,data){ return col.add(data); }
+function deleteDoc(ref){ return ref.delete(); }
+function onSnapshot(ref,cb,err){ return ref.onSnapshot(cb,err); }
+function orderBy(f,d='asc'){ return q=>q.orderBy(f,d); }
+function query(col,...constraints){ let q=col; constraints.forEach(c=>{q=c(q);}); return q; }
 
 // ─── FIREBASE CONFIG ─── paste yours here after setup ───
 const FB_CONFIG = {
@@ -84,7 +123,7 @@ const FB_CONFIG = {
 const app = initializeApp(FB_CONFIG);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
 
 // ─── APP STATE ───
 let currentUser = null;
@@ -781,8 +820,9 @@ window._m_renderVaccines=renderVaccines;
 window._m_toggleMilestone=toggleMilestone;
 window._m_toast=toast;
 // Signal that module has fully loaded
-if(window._flushQueue) window._flushQueue(); else window._moduleReady=true;
+window._moduleReady=true; if(window._flushQueue) window._flushQueue();
 
+</script>
 </script>
 
 <style>
@@ -1284,10 +1324,7 @@ Object.defineProperty(window,'_currentUser',{get:()=>window.__cu,set:v=>window._
 Object.defineProperty(window,'_appData',{get:()=>window.__ad,set:v=>window.__ad=v});
 </script>
 
-<script type="module">
-// Bridge currentUser and appData for settings page
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-</script>
+<!-- settings bridge handled by main module -->
 
 </body>
 </html>
